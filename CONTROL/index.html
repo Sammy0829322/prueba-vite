@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Changa+One:ital@0;1&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <div class="titulo">
+        <h1>CONTROL O.A.S.I.S</h1>
+    </div>
+    <header>
+        <div class="direip">
+            <div class="ip">
+                <h3>Escribe la direccion IP</h3>
+                <input type="text" id="ip-input" placeholder="Direccion IP" value="192.168.3.3">
+            </div>
+            <div class="btn-conectado">
+                <button id="btn-conectar">Conectar</button>
+                <button id="btn-desconectar">Desconectar</button>
+                <button id="btn-reconectar">Reconectar</button>
+            </div>
+        </div>
+        <div class="botones-conectados">
+            <div class="estado">
+                <h3>Estado:</h3>
+                <p id="estado">Desconectado</p>
+            </div>
+        </div>
+
+    </header>
+    <main>
+        <div class="controles">
+
+            <div class="btns-adelante-atras">
+                <button class="btn-adelante" onmousedown="enviarComando('adelante')" onmouseup="enviarComando('paro')"
+                    ontouchstart="enviarComando('adelante')" ontouchend="enviarComando('paro')">Adelante</button>
+                <button class="btn-atras" onmousedown="enviarComando('atras')" onmouseup="enviarComando('paro')"
+                    ontouchstart="enviarComando('atras')" ontouchend="enviarComando('paro')">Atrás</button>
+            </div>
+            <div class="btns-luces">
+                <div class="toggle">
+                    <input type="checkbox" id="btn-luz1">
+                    <label for="btn-luz1"></label>
+                </div>
+                <div class="toggle">
+                    <input type="checkbox" id="btn-luz2">
+                    <label for="btn-luz2"></label>
+                </div>
+                <div class="toggle">
+                    <input type="checkbox" id="btn-luz3">
+                    <label for="btn-luz3"></label>
+                </div>
+            </div>
+            <div class="btns-izquierda-derecha">
+                <button class="btn-izquierda" onmousedown="enviarComandoServo('izquierda')"
+                    onmouseup="enviarComandoServo('stop')" ontouchstart="enviarComandoServo('izquierda')"
+                    ontouchend="enviarComandoServo('stop')">Izquierda</button>
+                <button class="btn-derecha" onmousedown="enviarComandoServo('derecha')"
+                    onmouseup="enviarComandoServo('stop')" ontouchstart="enviarComandoServo('derecha')"
+                    ontouchend="enviarComandoServo('stop')">Derecha</button>
+            </div>
+        </div>
+        <div class="camara">
+            <h3>Camara</h3>
+        </div>
+        <div class="pinza">
+            <div class="pinza-card">
+                <div class="pinza-sombra">
+                    <h2>Base</h2>
+                </div>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo2', 'bajar')"
+                    onmouseup="enviarComandoServoPinza('servo2', 'stop')"
+                    ontouchstart="enviarComandoServoPinza('servo2', 'bajar')"
+                    ontouchend="enviarComandoServoPinza('servo2', 'stop')">Izquierda</button>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo2', 'subir')"
+                    onmouseup="enviarComandoServoPinza('servo2', 'stop')"
+                    ontouchstart="enviarComandoServoPinza('servo2', 'subir')"
+                    ontouchend="enviarComandoServoPinza('servo2', 'stop')">Derecha</button>
+            </div>
+            <div class="pinza-card">
+                <div class="pinza-sombra">
+                    <h2>Hombro</h2>
+                </div>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo3', 'bajar')"
+                    onmouseup="enviarComandoServoPinza('servo3', 'stop')"
+                    ontouchstart="enviarComandoServoPinza('servo3', 'bajar')"
+                    ontouchend="enviarComandoServoPinza('servo3', 'stop')">Bajar</button>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo3', 'subir')"
+                    onmouseup="enviarComandoServoPinza('servo3', 'stop')"
+                    ontouchstart="enviarComandoServoPinza('servo3', 'subir')"
+                    ontouchend="enviarComandoServoPinza('servo3', 'stop')">Subir</button>
+            </div>
+            <div class="pinza-card">
+                <div class="pinza-sombra">
+                    <h2>Extensión 1</h2>
+                </div>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo4', 'bajar')"
+                    onmouseup="enviarComandoServoPinza('servo4', 'stop')"
+                    ontouchstart="enviarComandoServoPinza('servo4', 'bajar')"
+                    ontouchend="enviarComandoServoPinza('servo4', 'stop')">Extender</button>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo4', 'subir')"
+                    onmouseup="enviarComandoServoPinza('servo4', 'stop')"
+                    ontouchstart="enviarComandoServoPinza('servo4', 'subir')"
+                    ontouchend="enviarComandoServoPinza('servo4', 'stop')">Retraer</button>
+            </div>
+            <div class="pinza-card">
+                <div class="pinza-sombra">
+                    <h2>Extensión 2</h2>
+                </div>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo5', 'bajar')"
+                    onmouseup="enviarComandoServoPinza('servo5', 'stop')"
+                    ontouchstart="enviarComandoServoPinza('servo5', 'bajar')"
+                    ontouchend="enviarComandoServoPinza('servo5', 'stop')">Extender</button>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo5', 'subir')"
+                    onmouseup="enviarComandoServoPinza('servo5', 'stop')"
+                    ontouchstart="enviarComandoServoPinza('servo5', 'subir')"
+                    ontouchend="enviarComandoServoPinza('servo5', 'stop')">Retraer</button>
+            </div>
+            <div class="pinza-card">
+                <div class="pinza-sombra">
+                    <h2>Muñeca</h2>
+                </div>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo6', 'bajar')"
+                    onmouseup="enviarComandoServoPinza('servo6', 'stop')"
+                    ontouchstart="enviarComandoServoPinza('servo6', 'bajar')"
+                    ontouchend="enviarComandoServoPinza('servo6', 'stop')">Giro Izq</button>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo6', 'subir')"
+                    onmouseup="enviarComandoServoPinza('servo6', 'stop')"
+                    ontouchstart="enviarComandoServoPinza('servo6', 'subir')"
+                    ontouchend="enviarComandoServoPinza('servo6', 'stop')">Giro Der</button>
+            </div>
+            <div class="pinza-card">
+                <div class="pinza-sombra">
+                    <h2>Pinza</h2>
+                </div>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo7', 'bajar')"
+                    onmouseup="enviarComandoServoPinza('servo7', 'stop')"
+                    ontouchstart="enviarComandoServoPinza('servo7', 'bajar')"
+                    ontouchend="enviarComandoServoPinza('servo7', 'stop')">Abrir</button>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo7', 'subir')"
+                    onmouseup="enviarComandoServoPinza('servo7', 'stop')"
+                    ontouchstart="enviarComandoServoPinza('servo7', 'subir')"
+                    ontouchend="enviarComandoServoPinza('servo7', 'stop')">Cerrar</button>
+            </div>
+
+            <div class="pinza-card">
+                <div class="pinza-sombra">
+                    <h2>Garra A</h2>
+                </div>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo8', 'bajar')"
+                    onmouseup="enviarComandoServoPinza('servo8', 'stop')"
+                    ontouchstart="enviarComandoServoPinza('servo8', 'bajar')"
+                    ontouchend="enviarComandoServoPinza('servo8', 'stop')">Abrir lado A</button>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo8', 'subir')"
+                    onmouseup="enviarComandoServoPinza('servo8', 'stop')"
+                    ontouchstart="enviarComandoServoPinza('servo8', 'subir')"
+                    ontouchend="enviarComandoServoPinza('servo8', 'stop')">Cerrar lado A</button>
+            </div>
+            <div class="pinza-card">
+                <div class="pinza-sombra">
+                    <h2>Garra B</h2>
+                </div>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo9', 'bajar')"
+                    onmouseup="enviarComandoServoPinza('servo9', 'stop')"
+                    ontouchstart="enviarComandoServoPinza('servo9', 'bajar')"
+                    ontouchend="enviarComandoServoPinza('servo9', 'stop')">Abrir lado B</button>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo9', 'subir')"
+                    onmouseup="enviarComandoServoPinza('servo9', 'stop')"
+                    ontouchstart="enviarComandoServoPinza('servo9', 'subir')"
+                    ontouchend="enviarComandoServoPinza('servo9', 'stop')">Cerrar lado B</button>
+            </div>
+        </div>
+    </main>
+    <script src="./app.js"></script>
+
+</body>
+
+</html>

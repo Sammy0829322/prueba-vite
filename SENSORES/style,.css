@@ -1,0 +1,369 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    list-style: none;
+    font-family: sans-serif;
+    text-decoration: none;
+    background-color: rgb(6, 6, 102);
+}
+
+.container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(17, 1fr);
+    /* grid-template-rows: 2fr 1fr 1fr; */
+    gap: 10px;
+    max-width: 1300px;
+    height: 1700px;
+    margin: auto;
+}
+
+.box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    /* height: 100px; */
+    border: 2px solid black;
+    border-radius: 5px;
+}
+
+.box-one {
+
+    border: 2px solid black;
+    border-radius: 5px;
+    grid-column: 1 / 6;
+    grid-row: 1 / 2;
+}
+
+.box-two {
+
+    border: 2px solid black;
+    border-radius: 5px;
+    grid-column: 1 / 6;
+    grid-row: 2 / 3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.box-four {
+
+    border: 2px solid black;
+    border-radius: 5px;
+    grid-column: 2 / 6;
+    grid-row: 3 / 8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+
+.box-seven {
+    border: 2px solid black;
+    border-radius: 5px;
+    grid-column: 2 / 6;
+    grid-row: 8 / 13;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+
+.chart-container {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.toggle-label {
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+#gasChart {
+    width: 100%;
+    height: 100%;
+    background-color: rgb(33, 166, 207, 0.62);
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgb(15, 136, 202);
+
+}
+
+/* Titulo */
+.titulo {
+    max-width: 1300px;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    background-color: rgb(33, 166, 207, 0.62);
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+.titulo h1 {
+    margin: 0;
+    padding: 20px;
+    background-color: rgb(33, 166, 207);
+    text-align: center;
+    border-radius: 10px;
+    border: 2px solid black;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    font-family: 'Archivo Black', sans-serif;
+    color: white;
+    font-size: 3.5rem;
+}
+
+/* end titulo */
+
+/* header */
+header {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    height: 100px;
+
+}
+
+.direip {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 70%;
+    height: 100px;
+
+}
+
+.ip {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+    width: 43%;
+    height: 80px;
+    background-color: rgb(33, 166, 207, 0.62);
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgb(15, 136, 202);
+
+
+}
+
+.btn-conectado {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    align-items: flex-end;
+    width: 57%;
+    height: 80px;
+
+    padding-bottom: 5px;
+    background-color: rgb(33, 166, 207, 0.62);
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgb(15, 136, 202);
+    margin-left: 10px;
+}
+
+.botones-conectados {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+
+    width: 30%;
+    height: 100px;
+}
+
+.estado {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    align-items: center;
+    width: 57%;
+    height: 80px;
+
+    padding-bottom: 5px;
+    background-color: rgb(33, 166, 207, 0.62);
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgb(15, 136, 202);
+    margin-left: 10px;
+
+}
+
+.btn-conectado button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 20%;
+    height: 50%;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.ip h3 {
+    color: white;
+    background-color: transparent;
+
+
+}
+
+.ip input {
+    width: 80%;
+    height: 50%;
+    padding: 8px 12px;
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: white;
+    color: #333;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ip input:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+}
+
+
+.estado h3 {
+    font-size: 20px;
+    color: white;
+    background-color: transparent;
+}
+
+.estado p {
+    font-size: 20px;
+    color: red;
+    background-color: transparent;
+    font-weight: bold;
+}
+
+/* Estados de conexión con colores */
+.estado p.conectado {
+    color: #00ff00;
+    /* Verde */
+}
+
+.estado p.desconectado {
+    color: red;
+}
+
+.estado p.conectando {
+    color: #ffa500;
+    /* Naranja */
+}
+
+.estado p.error {
+    color: #ff0000;
+    /* Rojo intenso */
+}
+
+/* end header */
+
+/* Display PPM */
+.ppm-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(33, 166, 207, 0.62);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 20px rgb(15, 136, 202);
+}
+
+.ppm-display h3 {
+    color: white;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.ppm-display p {
+    color: #00ff00;
+    font-size: 36px;
+    font-weight: bold;
+    font-family: 'Archivo Black', sans-serif;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Toggle switch styles */
+.toggle:before,
+.toggle:after {
+    content: "ON";
+    position: absolute;
+    font-size: 12px;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    padding: 10px 0;
+    z-index: 0;
+    color: #47c;
+}
+
+.toggle:after {
+    content: "OFF";
+    margin-top: -40px;
+    margin-left: 50px;
+    color: #666;
+}
+
+label {
+    position: relative;
+    z-index: 1;
+}
+
+.toggle {
+    background: #eee;
+    width: 100px;
+    height: 50px;
+    padding: 5px;
+    border-radius: 50px;
+    margin: 0;
+}
+
+label {
+    width: 40px;
+    height: 40px;
+    background: #ccc;
+    display: flex;
+    cursor: pointer;
+    border-radius: 50px;
+    transition: all 0.25s ease 0s;
+}
+
+input[type="checkbox"] {
+    display: none;
+}
+
+input:checked+label {
+    margin-left: 50px;
+    background: #47c;
+}
+
+/* End toggle switch styles */

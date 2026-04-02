@@ -1,0 +1,147 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+   list-style: none;
+  font-family: sans-serif;
+    text-decoration: none;
+   
+}
+
+
+/* Estilo de la navegación de pestañas */
+.navegacion {
+    background: white;
+    padding: 10px;
+    border-bottom: 2px solid #ddd;
+}
+
+.tab-link {
+    font-size: 16px;
+    padding: 10px 20px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+}
+
+.tab-link.activo {
+    /* El botón activo tiene una línea azul debajo */
+    border-bottom: 3px solid #007bff;
+    font-weight: bold;
+    color: #007bff;
+}
+
+/* Estilo de los contenedores de contenido */
+.contenido {
+    width: 80%;
+    height: 700px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.tab-content {
+    /* ¡TRUCO! Ocultamos todas las pestañas por defecto */
+    display: none;
+}
+
+.tab-content.activa {
+    /* Mostramos solo la que tiene la clase 'activa' */
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    height: 900px;
+    gap: 70px;
+}
+
+/* Estilo para el contenedor 3D */
+#contenedor-3d canvas {
+    /* El canvas se ajustará al contenedor */
+    width: 80%;
+    height: 300px; /* Altura fija para el mapa */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+/* Estilos para botones (opcional) */
+button {
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    padding: 0.6em 1.2em;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.25s;
+    margin-right: 5px; /* Pequeño margen entre botones */
+}
+button:hover {
+    border-color: #007bff;
+}
+
+/* Estilos para la UI de Coordenadas */
+.coordenadas-ui {
+    background: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+  ;
+}
+
+.coordenadas-ui p {
+   
+    font-size: 1.1em;
+}
+
+.coordenadas-ui span {
+    /* Texto de las coordenadas */
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    color: #0056b3; /* Un azul oscuro */
+    background: #f4f4f4;
+    padding: 2px 5px;
+    border-radius: 4px;
+}
+
+
+/* --- NUEVO: Estilos para la UI de Notas --- */
+.notas-ui {
+    background: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.notas-ui input[type="text"] {
+    width: calc(100% - 20px); /* Ancho completo menos padding */
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+#lista-notas {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px;
+}
+
+#lista-notas li {
+    background: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+}
+
+/* Estilo para la coordenada guardada dentro de la nota */
+.coord-guardada {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9em;
+    color: #555;
+    display: block; /* Para que aparezca en la línea de abajo */
+    margin-top: 5px;
+}
+/* --- FIN DE NUEVOS ESTILOS --- */
