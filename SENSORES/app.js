@@ -1,271 +1,175 @@
-// Variable global para el WebSocket
+// --- VARIABLES GLOBALES ---
 let socket = null;
-let medicionInterval = null;
-let gasChart = null;
+let canvas = null;
+let ctx = null;
+let audioContext = null;
 
-// Función para actualizar el estado de conexión
-function actualizarEstado(estado, mensaje = '') {
-  const estadoElement = document.getElementById('estado');
-  if (estadoElement) {
-    // Eliminar todas las clases de estado
-    estadoElement.classList.remove('conectado', 'desconectado', 'conectando', 'error');
-    
-    // Añadir la clase correspondiente y actualizar el texto
-    estadoElement.textContent = mensaje;
-    estadoElement.classList.add(estado);
-  }
-}
+// --- CONFIGURACIÓN DE SENSIBILIDAD ---
+// Aumenta este valor (ej. 5.0 o 8.0) si quieres que la gráfica se mueva mucho más
+const GANANCIA_VISUAL = 8.0; 
 
-// Función para inicializar la gráfica
-// Función para inicializar la gráfica corregida
+// Configuración de márgenes
+const padding = { top: 40, right: 30, bottom: 60, left: 70 };
+
 function inicializarGrafica() {
-  const ctx = document.getElementById('gasChart');
-  if (ctx) {
-    gasChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: [],
-        datasets: [{
-          label: 'PPM Gas LP',
-          data: [],
-          borderColor: 'rgb(12, 1, 16)',
-          backgroundColor: 'rgb(12, 1, 16)',
-          tension: 0.1,
-          borderWidth: 2,
-          // --- SOLUCIÓN PARA NO CORTAR EL CÍRCULO EN EL CERO ---
-          clip: false, // Permite que el punto se dibuje completo fuera del área del eje
-          pointRadius: 4,
-          pointHoverRadius: 6
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        layout: {
-          padding: {
-            // Añadimos un pequeño margen interno en el canvas para que 
-            // el punto que "sobresale" del eje 0 no se corte con el borde del div
-            bottom: 5 
-          }
-        },
-        scales: {
-          x: {
-            display: true,
-            title: {
-              display: true,
-              text: 'Tiempo',
-              color: 'black',
-              font: { size: 14, weight: 'bold' }
-            },
-            ticks: {
-              color: 'black',
-              maxRotation: 45,
-              minRotation: 45,
-              autoSkip: true,
-              maxTicksLimit: 10,
-              padding: 10
-            },
-            grid: {
-              color: 'rgba(26, 1, 1, 0.1)',
-              drawBorder: true,
-              borderColor: 'rgba(20, 2, 2, 0.89)'
-            }
-          },
-          y: {
-            display: true,
-            title: {
-              display: true,
-              text: 'PPM',
-              color: 'black',
-              font: { size: 14, weight: 'bold' }
-            },
-            ticks: {
-              color: 'black',
-              padding: 10
-            },
-            grid: {
-              color: 'rgba(19, 2, 2, 0.74)',
-              drawBorder: true,
-              borderColor: 'rgba(18, 1, 1, 0.61)'
-            },
-            // --- RANGO SOLICITADO ---
-            min: 0,
-            max: 5000,
-            beginAtZero: true
-          }
-        },
-        plugins: {
-          legend: {
-            display: true,
-            labels: {
-              color: 'white',
-              font: { size: 12 }
-            }
-          }
-        }
-      }
-    });
+  canvas = document.getElementById('gasChart');
+  if (canvas) {
+    ctx = canvas.getContext('2d');
+    canvas.width = 800;
+    canvas.height = 400;
+    dibujarEjesYValores(1024);
   }
 }
 
-// Función para enviar solicitud de medición cada segundo
-function iniciarMediciones() {
-  medicionInterval = setInterval(() => {
-    const btnMedicion = document.getElementById('btn-medicion');
-    if (socket && socket.readyState === WebSocket.OPEN && btnMedicion && btnMedicion.checked) {
-      const mensaje = {
-        "tipo": "medicion",
-        "sensor": "gaslp"
-      };
-      socket.send(JSON.stringify(mensaje));
-      console.log("Enviando solicitud de medición:", mensaje);
-    }
-  }, 1000);
-}
+function dibujarEjesYValores(totalMuestras) {
+  const w = canvas.width;
+  const h = canvas.height;
 
-// Función para detener mediciones
-function detenerMediciones() {
-  if (medicionInterval) {
-    clearInterval(medicionInterval);
-    medicionInterval = null;
+  ctx.fillStyle = 'rgb(10, 10, 10)';
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+  ctx.lineWidth = 1;
+  ctx.fillStyle = 'rgb(180, 180, 180)';
+  ctx.font = '12px "Segoe UI", Arial';
+
+  const anchoUtil = w - padding.left - padding.right;
+  const altoUtil = h - padding.top - padding.bottom;
+
+  // EJE Y
+  ctx.textAlign = 'right';
+  const divisionesY = 4;
+  for (let i = 0; i <= divisionesY; i++) {
+    const y = padding.top + (i * altoUtil / divisionesY);
+    const valorY = (1.0 - (i * 2 / divisionesY)).toFixed(1);
+    ctx.beginPath();
+    ctx.moveTo(padding.left, y);
+    ctx.lineTo(w - padding.right, y);
+    ctx.stroke();
+    ctx.fillText(valorY, padding.left - 12, y + 4);
   }
-}
 
-// Función para actualizar la gráfica con nuevos datos
-function actualizarGrafica(ppm) {
-  if (gasChart) {
-    // Actualizar display de PPM
-    const ppmValueElement = document.getElementById('ppm-value');
-    if (ppmValueElement) {
-      ppmValueElement.textContent = ppm.toFixed(2);
-    }
-    
-    // Mantener máximo 20 puntos en la gráfica
-    if (gasChart.data.labels.length >= 20) {
-      gasChart.data.labels.shift();
-      gasChart.data.datasets[0].data.shift();
-    }
-    
-    const ahora = new Date();
-    const tiempo = ahora.getHours().toString().padStart(2, '0') + ':' + 
-                   ahora.getMinutes().toString().padStart(2, '0') + ':' + 
-                   ahora.getSeconds().toString().padStart(2, '0');
-    
-    gasChart.data.labels.push(tiempo);
-    gasChart.data.datasets[0].data.push(ppm);
-    gasChart.update();
+  // EJE X
+  ctx.textAlign = 'center';
+  const divisionesX = 8;
+  for (let i = 0; i <= divisionesX; i++) {
+    const x = padding.left + (i * anchoUtil / divisionesX);
+    const valorX = Math.round((i / divisionesX) * totalMuestras);
+    ctx.beginPath();
+    ctx.moveTo(x, padding.top);
+    ctx.lineTo(x, h - padding.bottom);
+    ctx.stroke();
+    ctx.fillText(valorX, x, h - padding.bottom + 25);
   }
+
+  ctx.font = 'bold 13px "Segoe UI"';
+  ctx.fillStyle = 'rgb(0, 255, 150)';
+  ctx.save();
+  ctx.translate(25, padding.top + altoUtil / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText("AMPLITUD (Visual x" + GANANCIA_VISUAL + ")", 0, 0);
+  ctx.restore();
+  ctx.fillText("TIEMPO (Muestras)", padding.left + anchoUtil / 2, h - 15);
+  
+  ctx.strokeStyle = 'rgb(60, 60, 60)';
+  ctx.strokeRect(padding.left, padding.top, anchoUtil, altoUtil);
 }
 
-// Función para conectar al WebSocket
+function graficarOndaDeAudio(datos) {
+  if (!ctx || !canvas) return;
+
+  dibujarEjesYValores(datos.length);
+
+  const anchoUtil = canvas.width - padding.left - padding.right;
+  const altoUtil = canvas.height - padding.top - padding.bottom;
+  const centroY = padding.top + (altoUtil / 2);
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(padding.left, padding.top, anchoUtil, altoUtil);
+  ctx.clip();
+
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = 'rgb(0, 255, 150)'; 
+  ctx.shadowBlur = 10;
+  ctx.shadowColor = 'rgba(0, 255, 150, 0.8)';
+  ctx.beginPath();
+
+  for (let i = 0; i < datos.length; i++) {
+    const x = padding.left + (i / datos.length) * anchoUtil;
+    
+    // --- MODIFICACIÓN CLAVE: Multiplicamos por GANANCIA_VISUAL ---
+    // Esto escala la señal para que los pequeños cambios se vean grandes
+    let amplitudNormalizada = (datos[i] / 32768.0) * GANANCIA_VISUAL;
+    
+    // Limitar para que no "rompa" el dibujo si el valor es muy alto
+    if (amplitudNormalizada > 1.0) amplitudNormalizada = 1.0;
+    if (amplitudNormalizada < -1.0) amplitudNormalizada = -1.0;
+
+    const y = centroY - (amplitudNormalizada * (altoUtil / 2));
+
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  
+  ctx.stroke();
+  ctx.restore();
+  
+  reproducirAudio(datos);
+}
+
+function reproducirAudio(datos) {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  const floatData = new Float32Array(datos.length);
+  for (let i = 0; i < datos.length; i++) {
+    floatData[i] = datos[i] / 32768.0; // El audio sigue original, sin distorsión
+  }
+  const audioBuffer = audioContext.createBuffer(1, floatData.length, 44100);
+  audioBuffer.getChannelData(0).set(floatData);
+  const source = audioContext.createBufferSource();
+  source.buffer = audioBuffer;
+  source.connect(audioContext.destination);
+  source.start();
+}
+
 function conectarWebSocket() {
   const ipInput = document.getElementById('ip-input');
   const ip = ipInput.value.trim();
+  if (!ip) return;
   
-  if (!ip) {
-    alert('Por favor, ingrese una dirección IP');
-    return;
-  }
-  
-  // Si ya hay una conexión, cerrarla primero
-  if (socket && socket.readyState !== WebSocket.CLOSED) {
-    socket.close();
-  }
-  
-  // Actualizar estado a "Conectando..."
   actualizarEstado('conectando', 'Conectando...');
-  
-  // Crear nueva conexión WebSocket con la IP del input
   socket = new WebSocket(`ws://${ip}/ws`);
+  socket.binaryType = "arraybuffer"; 
   
-  socket.onopen = () => {
-    console.log("Conectado al ESP32 vía WebSocket en IP:", ip);
-    actualizarEstado('conectado', 'Conectado');
-    // No iniciar mediciones automáticamente, esperar a que el usuario active el switch
-  };
-  
+  socket.onopen = () => actualizarEstado('conectado', 'Conectado');
   socket.onmessage = (event) => {
-    console.log("Mensaje recibido del ESP32:", event.data);
-    try {
-      const datos = JSON.parse(event.data);
-      
-      // Procesar respuesta del sensor de gas
-      if (datos.tipo === 'lectura_gas' && datos.ppm !== undefined) {
-        console.log("PPM recibido:", datos.ppm);
-        actualizarGrafica(datos.ppm);
-      }
-    } catch (error) {
-      console.error("Error al procesar mensaje JSON:", error);
+    if (event.data instanceof ArrayBuffer) {
+      const audioData = new Int16Array(event.data);
+      graficarOndaDeAudio(audioData);
     }
   };
-  
-  socket.onclose = () => {
-    console.log("WebSocket cerrado");
-    actualizarEstado('desconectado', 'Desconectado');
-    detenerMediciones();
-  };
-  
-  socket.onerror = (error) => {
-    console.error("Error en WebSocket:", error);
-    actualizarEstado('error', 'Error de conexión');
-    alert('Error de conexión. Verifique la IP y que el robot esté encendido.');
-    detenerMediciones();
-  };
+  socket.onclose = () => actualizarEstado('desconectado', 'Desconectado');
+  socket.onerror = () => actualizarEstado('error', 'Error en conexión');
 }
 
-// Función para desconectar
-function desconectarWebSocket() {
-  detenerMediciones();
-  if (socket && socket.readyState !== WebSocket.CLOSED) {
-    socket.close();
-  }
-  actualizarEstado('desconectado', 'Desconectado');
+function actualizarEstado(estado, mensaje) {
+  const el = document.getElementById('estado');
+  if (el) { el.className = estado; el.textContent = mensaje; }
 }
 
-// Función para reconectar
-function reconectarWebSocket() {
-  desconectarWebSocket();
-  setTimeout(() => {
-    conectarWebSocket();
-  }, 1000);
-}
-
-// Event listeners para los botones
 document.addEventListener('DOMContentLoaded', () => {
   const btnConectar = document.getElementById('btn-conectar');
-  const btnDesconectar = document.getElementById('btn-desconectar');
-  const btnReconectar = document.getElementById('btn-reconectar');
   const btnMedicion = document.getElementById('btn-medicion');
   
-  if (btnConectar) {
-    btnConectar.addEventListener('click', conectarWebSocket);
-  }
-  if (btnDesconectar) {
-    btnDesconectar.addEventListener('click', desconectarWebSocket);
-  }
-  if (btnReconectar) {
-    btnReconectar.addEventListener('click', reconectarWebSocket);
-  }
+  if (btnConectar) btnConectar.addEventListener('click', conectarWebSocket);
   if (btnMedicion) {
-    btnMedicion.addEventListener('change', (event) => {
-      if (event.target.checked) {
-        // Iniciar mediciones si el switch está activado
-        if (!medicionInterval) {
-          iniciarMediciones();
-        }
-      } else {
-        // Detener mediciones si el switch está desactivado
-        detenerMediciones();
-        // Limpiar la gráfica
-        if (gasChart) {
-          gasChart.data.labels = [];
-          gasChart.data.datasets[0].data = [];
-          gasChart.update();
-        }
+    btnMedicion.addEventListener('change', (e) => {
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(e.target.checked ? "AUDIO_ON" : "AUDIO_OFF");
       }
     });
   }
-  
-  // Inicializar la gráfica al cargar la página
   inicializarGrafica();
 });
