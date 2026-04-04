@@ -1,172 +1,110 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mapa 3D - OASIS</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-
-        .websocket-controls {
-            background: #f5f5f5;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-        }
-
-        .websocket-controls h3 {
-            margin: 0 0 10px 0;
-            color: #333;
-        }
-
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-            align-items: center;
-        }
-
-        .input-group input {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            flex: 1;
-        }
-
-        .input-group button {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .btn-conectar {
-            background: #28a745;
-            color: white;
-        }
-
-        .btn-desconectar {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-reconectar {
-            background: #ffc107;
-            color: black;
-        }
-
-        .estado-sensor {
-            margin-top: 10px;
-            padding: 10px;
-            background: white;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-        }
-
-        .estado-sensor p {
-            margin: 5px 0;
-            font-size: 14px;
-        }
-
-        .estado-sensor .conectado {
-            color: #28a745;
-            font-weight: bold;
-        }
-
-        .estado-sensor .desconectado {
-            color: #dc3545;
-            font-weight: bold;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.activa {
-            display: flex;
-        }
-
-        #contenedor-3d {
-            width: 100%;
-            height: 600px;
-
-            margin: 10px 0;
-            background: #f0f0f0;
-        }
-
-        .coordenadas-ui,
-        .notas-ui {
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapa 3D - OASIS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Changa+One:ital@0;1&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
-    <!-- Controles WebSocket para sensores -->
-    <div class="websocket-controls">
-        <h3>Conexión Sensores Robot</h3>
-        <div class="input-group">
-            <input type="text" id="ip-input-sensor" placeholder="Dirección IP" value="192.168.3.3">
-            <button id="btn-conectar-sensor" class="btn-conectar">Conectar</button>
-            <button id="btn-desconectar-sensor" class="btn-desconectar">Desconectar</button>
-            <button id="btn-reconectar-sensor" class="btn-reconectar">Reconectar</button>
-        </div>
-        <div class="estado-sensor">
-            <p>Estado: <span id="estado-sensor" class="desconectado">Desconectado</span></p>
-            <p>Datos Acelerómetro: <span id="datos-accel">X: 0.00, Y: 0.00, Z: 0.00</span></p>
-            <p>Dados Giroscopio: <span id="datos-gyro">X: 0.00, Y: 0.00, Z: 0.00</span></p>
-            <p>Temperatura: <span id="datos-temp">0.0°C</span></p>
-        </div>
+  <div class="container">
+    <div class="box-one">
+      <div class="titulo">
+        <h1>MAPA 3D O.A.S.I.S</h1>
+      </div>
     </div>
-
-    <!-- Elementos que main.js espera encontrar -->
-    <nav class="navegacion" style="display: none;">
-        <button class="tab-link activo" data-tab="mapa">Mapa 3D</button>
-    </nav>
-
-    <main class="contenido">
-        <div id="mapa" class="tab-content activa">
-            <div id="contenedor-3d"></div>
-
-            <div class="coordenadas-ui">
-                <button id="btn-actualizar-coords">Ver Posición Actual</button>
-                <p>
-                    Posición del Robot:
-                    <span id="texto-coords">(esperando...)</span>
-                </p>
-            </div>
-<div class="notas-ui" style="padding: 15px;">
-                <h3>Guardar Ubicación con Nota y Fotos</h3>
-                <p>Escribe una nota, adjunta múltiples fotos de la cámara (opcional) y registra la posición. Puedes seleccionar varias imágenes manteniendo presionada Ctrl o Cmd.</p>
-                
-                <input type="file" id="input-foto" accept="image/*" multiple style="margin-bottom: 10px; display: block;" title="Puedes seleccionar múltiples imágenes manteniendo presionada Ctrl o Cmd">
-                
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <input type="text" id="input-nota" placeholder="Ej: Posible víctima localizada..." style="flex: 1; padding: 8px;">
-                    <button id="btn-guardar-nota" style="padding: 8px 15px; cursor: pointer;">Guardar Nota</button>
-                    <button id="btn-exportar" style="padding: 8px 15px; cursor: pointer; background: #17a2b8; color: white; border: none; border-radius: 4px;">Exportar Ruta (CSV)</button>
-                </div>
-
-                <h3>Registro de Hallazgos</h3>
-                <ul id="lista-notas" style="list-style-type: none; padding-left: 0;"></ul>
-            </div>
+    
+    <div class="box-two">
+      <header>
+        <div class="ip">
+          <h3>Escribe la direccion IP</h3>
+          <input type="text" id="ip-input-sensor" placeholder="Direccion IP" value="192.168.3.3">
         </div>
-    </main>
-
-    <!-- Botón que main.js espera -->
-    <button id="boton-direccion" style="display: none;">Cambiar Dirección</button>
-
-    <script type="module" src="/src/main.js"></script>
+        <div class="btn-conectado">
+          <button id="btn-conectar-sensor">Conectar</button>
+          <button id="btn-desconectar-sensor">Desconectar</button>
+          <button id="btn-reconectar-sensor">Reconectar</button>
+        </div>
+        <div class="botones-conectados">
+          <div class="estado">
+            <h3>Estado:</h3>
+            <p id="estado-sensor">Desconectado</p>
+          </div>
+        </div>
+      </header>
+    </div>
+    
+    <div class="box-three">
+      <div class="datos-sensores">
+        <div class="sensor-item">
+          <h4>Acelerómetro</h4>
+          <p id="datos-accel">X: 0.00°, Y: 0.00°, Z: 0.00°</p>
+        </div>
+        <div class="sensor-item">
+          <h4>Giroscopio</h4>
+          <p id="datos-gyro">X: 0.00°, Y: 0.00°, Z: 0.00°</p>
+        </div>
+        <div class="sensor-item">
+          <h4>Temperatura</h4>
+          <p id="datos-temp">0.0°C</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="box-four">
+      <div class="mapa-container">
+        <div id="contenedor-3d"></div>
+      </div>
+    </div>
+    
+    <div class="box-five">
+      <div class="coordenadas-ui">
+        <h3>Coordenadas del Robot</h3>
+        <button id="btn-actualizar-coords">Ver Posición Actual</button>
+        <p>
+          <span id="texto-coords">(esperando...)</span>
+        </p>
+      </div>
+    </div>
+    
+    <div class="box-six">
+      <div class="notas-ui">
+        <h3>Guardar Ubicación con Notas y Fotos</h3>
+        <p>Escribe una nota, adjunta múltiples fotos y registra la posición.</p>
+        
+        <input type="file" id="input-foto" accept="image/*" multiple title="Puedes seleccionar múltiples imágenes">
+        
+        <div class="input-nota-container">
+          <input type="text" id="input-nota" placeholder="Ej: Posible víctima localizada...">
+          <button id="btn-guardar-nota">Guardar Nota</button>
+        </div>
+        
+        <button id="btn-exportar" class="btn-exportar">Exportar Ruta (CSV)</button>
+      </div>
+    </div>
+    
+    <div class="box-seven">
+      <div class="registro-hallazgos">
+        <h3>Registro de Hallazgos</h3>
+        <ul id="lista-notas"></ul>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Elementos ocultos que main.js espera -->
+  <nav class="navegacion" style="display: none;">
+    <button class="tab-link activo" data-tab="mapa">Mapa 3D</button>
+  </nav>
+  <button id="boton-direccion" style="display: none;">Cambiar Dirección</button>
+  
+  <script type="module" src="./main.js"></script>
 </body>
-
-</html>
 
 </html>
