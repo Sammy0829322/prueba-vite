@@ -4,20 +4,21 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 // --- VARIABLES GLOBALES DE ESTADO ---
-let moveDirection = 1; // Mantenido por si lo usas en otro lado
+let moveDirection = 1; 
 
 // --- VARIABLES WEBSOCKET PARA SENSORES ---
 let socketSensor = null;
 let sensorData = {
-    accel_x: 0,
-    accel_y: 0,
-    accel_z: 0,
-    gyro_x: 0,
-    gyro_y: 0,
-    gyro_z: 0,
-    temp: 0
+    yaw: 0,
+    pitch: 0,
+    roll: 0,
+    distancia: 0 
 };
 let sensorInterval = null; 
+
+// NUEVAS VARIABLES PARA MOVIMIENTO Y TARA
+let yawOffset = 0; 
+let lastDistancia = 0; 
 
 // --- PARTE 1: LÓGICA DE THREE.JS (Declaración) ---
 let camera, renderer, scene, contenedor3D, robot, pathLine; 
@@ -30,6 +31,7 @@ contenedor3D = document.getElementById('contenedor-3d');
 scene = new THREE.Scene(); 
 scene.background = new THREE.Color(0x222222);
 
+// Cámara posicionada para mirar hacia el Norte (-Z)
 const initialWidth = contenedor3D.clientWidth > 0 ? contenedor3D.clientWidth : window.innerWidth * 0.5;
 const initialHeight = 300;
 
@@ -52,30 +54,86 @@ const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
 directionalLight.position.set(5, 10, 5);
 scene.add(directionalLight);
 
-// 6. Suelo y Cuadrícula
+// 6. Suelo, Cuadrícula y Ejes
 const plane = new THREE.Mesh(
-    new THREE.PlaneGeometry(30, 30),
-    new THREE.MeshStandardMaterial({ color: 0x444444 })
+    new THREE.PlaneGeometry(100, 100),
+    new THREE.MeshStandardMaterial({ 
+        color: 0x444444,
+        transparent: true,        // NUEVO: Activa la transparencia
+        opacity: 0.1,             // NUEVO: Nivel de transparencia (0.0 a 1.0)
+        side: THREE.DoubleSide    // NUEVO: Permite ver el piso desde arriba y desde abajo
+     })
 );
 plane.rotation.x = -Math.PI / 2;
 scene.add(plane);
 
-const gridHelper = new THREE.GridHelper(30, 30);
+const gridHelper = new THREE.GridHelper(100, 100);
 scene.add(gridHelper);
 
-// 7. El Robot 
-robot = new THREE.Mesh(
-    new THREE.BoxGeometry(1, 0.5, 2),
-    new THREE.MeshStandardMaterial({ color: 0xff0000 })
-);
-robot.position.y = 0.25;
+// Ejes visuales (Rojo = X, Verde = Y, Azul = Z)
+const axesHelper = new THREE.AxesHelper(15);
+scene.add(axesHelper);
+
+// Función para crear etiquetas de texto 3D
+function crearEtiqueta3D(texto, x, y, z) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 64;
+    const ctx = canvas.getContext('2d');
+    
+    ctx.font = 'Bold 28px Arial';
+    ctx.fillStyle = '#00ff00'; 
+    ctx.textAlign = 'center';
+    ctx.fillText(texto, 128, 40);
+
+    const textura = new THREE.CanvasTexture(canvas);
+    const material = new THREE.SpriteMaterial({ map: textura });
+    const sprite = new THREE.Sprite(material);
+    
+    sprite.position.set(x, y, z);
+    sprite.scale.set(3, 0.75, 1); 
+    scene.add(sprite);
+}
+
+// Colocar los valores en el mapa (1 unidad 3D = 10 cm reales)
+crearEtiqueta3D("Frente 50 cm", 0, 0.2, -5);
+crearEtiqueta3D("Frente 100 cm", 0, 0.2, -10);
+crearEtiqueta3D("Der 50 cm", 5, 0.2, 0);
+crearEtiqueta3D("Der 100 cm", 10, 0.2, 0);
+crearEtiqueta3D("Izq -50 cm", -5, 0.2, 0);
+crearEtiqueta3D("Izq -100 cm", -10, 0.2, 0);
+crearEtiqueta3D("Altura +50 cm", 0, 5, 0);
+
+// 7. El Robot (AHORA ES UNA FLECHA 3D)
+robot = new THREE.Group(); 
+
+const materialRojo = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+
+// 7.1 Cuerpo de la flecha (Rectángulo)
+const cuerpoGeo = new THREE.BoxGeometry(0.8, 0.3, 2);
+const cuerpo = new THREE.Mesh(cuerpoGeo, materialRojo);
+cuerpo.position.z = 1; 
+
+// 7.2 Punta de la flecha (Cono)
+const puntaGeo = new THREE.ConeGeometry(0.8, 1.5, 16);
+const punta = new THREE.Mesh(puntaGeo, materialRojo);
+punta.rotation.x = -Math.PI / 2; 
+punta.position.z = -0.75; 
+
+// Unimos las piezas al grupo principal
+robot.add(cuerpo);
+robot.add(punta);
+
+robot.position.y = 0.5; 
 scene.add(robot);
 
-// 8. El Rastro (Se mantiene la declaración por si se usa después con el sensor Hall)
+// 8. El Rastro (Se inicializa con la posición 0,0,0)
 const pathPoints = [];
+pathPoints.push(robot.position.clone()); 
+
 const pathMaterial = new THREE.LineBasicMaterial({ 
-    color: 0x00ff00,
-    linewidth: 1  
+    color: 0x0088ff,
+    linewidth: 2  
 });
 let pathGeometry = new THREE.BufferGeometry().setFromPoints(pathPoints);
 pathLine = new THREE.Line(pathGeometry, pathMaterial);
@@ -104,7 +162,6 @@ function crearPinUbicacion3D(posicion) {
     pinGroup.add(sphere);
 
     pinGroup.position.copy(posicion);
-    pinGroup.position.y = 0; 
     
     pinGroup.userData.materialNormal = pinMaterial;
     pinGroup.userData.materialHover = pinMaterialHover;
@@ -175,10 +232,14 @@ document.addEventListener("DOMContentLoaded", () => {
         botonCoords.style.display = 'none';
     }
 
-    // 4. Conectar los elementos para guardar notas
+    // 4. Conectar los elementos para guardar notas y fotos
     const btnGuardarNota = document.getElementById('btn-guardar-nota');
     const inputNota = document.getElementById('input-nota');
+    const inputFoto = document.getElementById('input-foto'); // NUEVO
     const listaNotas = document.getElementById('lista-notas');
+
+    // MODIFICACIÓN: Permitir múltiples imágenes
+    inputFoto.multiple = true;
 
     if (btnGuardarNota && inputNota && listaNotas) {
         btnGuardarNota.addEventListener('click', () => {
@@ -189,14 +250,43 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             const pos = robot.position.clone(); 
-            const textoPosicion = `X: ${pos.x.toFixed(2)}, Y: ${pos.y.toFixed(2)}, Z: ${pos.z.toFixed(2)}`;
+            
+            // Coordenadas escaladas a valores reales
+            const realX = pos.x * 10;
+            const realY = pos.y * 10;
+            const realZ = pos.z * 10;
+            const textoPosicion = `X: ${realX.toFixed(1)}, Y: ${realY.toFixed(1)}, Z: ${realZ.toFixed(1)} | Distancia: ${sensorData.distancia.toFixed(1)} cm`;
+
+            // --- LÓGICA PARA MÚLTIPLES IMÁGENES ---
+            let etiquetaImagen = "";
+            let imagenesUrls = [];
+            if (inputFoto && inputFoto.files.length > 0) {
+                etiquetaImagen = '<div class="imagenes-container" style="margin-top: 8px;">';
+                for (let i = 0; i < inputFoto.files.length; i++) {
+                    const archivo = inputFoto.files[i];
+                    const urlImagen = URL.createObjectURL(archivo);
+                    imagenesUrls.push(urlImagen);
+                    // Crea una miniatura de 100px de ancho con click para ampliar
+                    etiquetaImagen += `<img src="${urlImagen}" style="max-width: 100px; height: 80px; border-radius: 4px; margin: 2px; border: 1px solid #ccc; cursor: pointer; object-fit: cover;" onclick="verImagenGrande('${urlImagen}')" title="Click para ver más grande">`;
+                }
+                etiquetaImagen += '</div>';
+            }
+            // -----------------------------
 
             const pin3D = crearPinUbicacion3D(pos); 
 
             const nuevoItemLista = document.createElement('li');
+            nuevoItemLista.style.marginBottom = "15px";
+            nuevoItemLista.style.padding = "10px";
+            nuevoItemLista.style.background = "#fff";
+            nuevoItemLista.style.border = "1px solid #ddd";
+            nuevoItemLista.style.borderRadius = "5px";
+            
+            // Insertamos texto, coordenadas y la imagen (si existe)
             nuevoItemLista.innerHTML = `
-                ${textoNota}
-                <span class="coord-guardada">(${textoPosicion})</span>
+                <strong>${textoNota}</strong><br>
+                <span class="coord-guardada" style="color: #666; font-size: 0.9em;">(${textoPosicion})</span>
+                ${etiquetaImagen}
             `;
 
             nuevoItemLista.addEventListener('mouseover', () => {
@@ -214,12 +304,116 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             listaNotas.prepend(nuevoItemLista); 
+            
+            // Limpiamos los campos para la siguiente entrada
             inputNota.value = "";
+            if(inputFoto) inputFoto.value = ""; 
+        });
+    }
+
+    // --- NUEVO: FUNCIÓN PARA EXPORTAR LA RUTA A CSV ---
+    const btnExportar = document.getElementById('btn-exportar');
+    if (btnExportar) {
+        btnExportar.addEventListener('click', () => {
+            if (pathPoints.length === 0) {
+                alert("No hay ruta para exportar");
+                return;
+            }
+
+            let contenidoCSV = "X(cm),Y(cm),Z(cm)\n";
+
+            pathPoints.forEach(punto => {
+                const rX = (punto.x * 10).toFixed(2);
+                const rY = (punto.z * 10).toFixed(2); 
+                const rZ = (punto.y * 10).toFixed(2); 
+                contenidoCSV += `${rX},${rY},${rZ}\n`;
+            });
+
+            const blob = new Blob([contenidoCSV], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "ruta_oasis.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         });
     }
 
     handleResize();
 });
+
+// --- FUNCIÓN PARA VER IMÁGENES EN TAMAÑO GRANDE ---
+window.verImagenGrande = function(urlImagen) {
+    // Crear modal para ver imagen grande
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        cursor: pointer;
+        animation: fadeIn 0.3s ease-out;
+    `;
+    
+    const img = document.createElement('img');
+    img.src = urlImagen;
+    img.style.cssText = `
+        max-width: 90%;
+        max-height: 90%;
+        border-radius: 8px;
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        animation: zoomIn 0.3s ease-out;
+    `;
+    
+    // Agregar animaciones CSS al head si no existen
+    if (!document.getElementById('image-modal-animations')) {
+        const style = document.createElement('style');
+        style.id = 'image-modal-animations';
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+            @keyframes zoomIn {
+                from { transform: scale(0.8); opacity: 0; }
+                to { transform: scale(1); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    modal.appendChild(img);
+    
+    // Cerrar modal al hacer click
+    modal.addEventListener('click', () => {
+        modal.style.animation = 'fadeOut 0.3s ease-out';
+        setTimeout(() => {
+            document.body.removeChild(modal);
+        }, 290);
+    });
+    
+    document.body.appendChild(modal);
+    
+    // Cerrar con tecla ESC
+    const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+            modal.click();
+            document.removeEventListener('keydown', handleEscape);
+        }
+    };
+    document.addEventListener('keydown', handleEscape);
+};
 
 // --- FUNCIONES WEBSOCKET PARA SENSORES ---
 
@@ -263,13 +457,10 @@ function conectarWebSocketSensor() {
             
             if (datos.tipo === "datos_sensor") {
                 sensorData = {
-                    accel_x: datos.accel_x || 0,
-                    accel_y: datos.accel_y || 0,
-                    accel_z: datos.accel_z || 0,
-                    gyro_x: datos.gyro_x || 0,
-                    gyro_y: datos.gyro_y || 0,
-                    gyro_z: datos.gyro_z || 0,
-                    temp: datos.temp || 0
+                    yaw: datos.yaw || 0,
+                    pitch: datos.pitch || 0,
+                    roll: datos.roll || 0,
+                    distancia: datos.distancia || 0
                 };
                 
                 actualizarDatosSensorUI();
@@ -302,7 +493,6 @@ function enviarSolicitudPosicion() {
 function iniciarSolicitudesAutomaticas() {
     detenerSolicitudesAutomaticas();
     
-    // Intervalo a 100ms para movimiento fluido
     sensorInterval = setInterval(() => {
         enviarSolicitudPosicion();
     }, 100);
@@ -320,31 +510,46 @@ function actualizarDatosSensorUI() {
     const elGyro = document.getElementById('datos-gyro');
     const elTemp = document.getElementById('datos-temp');
 
-    if (elAccel) elAccel.textContent = `X: ${sensorData.accel_x.toFixed(2)}, Y: ${sensorData.accel_y.toFixed(2)}, Z: ${sensorData.accel_z.toFixed(2)}`;
-    if (elGyro) elGyro.textContent = `X: ${sensorData.gyro_x.toFixed(2)}, Y: ${sensorData.gyro_y.toFixed(2)}, Z: ${sensorData.gyro_z.toFixed(2)}`;
-    if (elTemp) elTemp.textContent = `${sensorData.temp.toFixed(1)}°C`;
+    if (elAccel) elAccel.textContent = `Yaw: ${sensorData.yaw.toFixed(2)}°`;
+    if (elGyro) elGyro.textContent = `Pitch: ${sensorData.pitch.toFixed(2)}°`;
+    if (elTemp) elTemp.textContent = `Roll: ${sensorData.roll.toFixed(2)}°`;
 }
 
-// CORRECCIÓN: Función modificada para rotar únicamente, omitiendo la traslación
 function moverRobotConSensores() {
     if (!robot) return;
     
-    const deadzoneGyro = 0.05; // Evita rotación si el giro es muy bajo (ruido)
+    const gradosARadianes = Math.PI / 180;
+    let yawCorregido = sensorData.yaw - yawOffset;
 
-    // 1. Rotación usando el giroscopio (eje Z del MPU)
-    if (Math.abs(sensorData.gyro_z) > deadzoneGyro) {
-        robot.rotation.y -= sensorData.gyro_z * 0.1; 
+    // 1. APLICAR ROTACIÓN 
+    robot.rotation.y = -yawCorregido * gradosARadianes;  
+    robot.rotation.x = sensorData.pitch * gradosARadianes; 
+    robot.rotation.z = sensorData.roll * gradosARadianes;  
+
+    // 2. APLICAR MOVIMIENTO FÍSICO
+    let deltaDistancia = sensorData.distancia - lastDistancia;
+
+    if (deltaDistancia < 0) {
+        lastDistancia = sensorData.distancia;
+        deltaDistancia = 0;
     }
 
-    // --- ACELERÓMETRO OMITIDO ---
-    // Toda la lógica de movimiento X/Z y guardado del rastro (pathPoints)
-    // fue eliminada de esta sección para evitar que la caja se deslice.
-    
-    // Opcional: Mostrar los grados de rotación en lugar de las coordenadas X/Z
+    if (deltaDistancia > 0) {
+        const escalaMovimiento = 0.1; 
+        
+        robot.translateZ(-deltaDistancia * escalaMovimiento);
+
+        // 3. DIBUJAR EL RASTRO 
+        pathPoints.push(robot.position.clone());
+        pathGeometry.dispose();
+        pathGeometry = new THREE.BufferGeometry().setFromPoints(pathPoints);
+        pathLine.geometry = pathGeometry;
+
+        lastDistancia = sensorData.distancia;
+    }
+
     if (textoCoordsSpan) {
-        // Convierte radianes a grados para que sea más fácil de leer
-        const grados = (robot.rotation.y * (180 / Math.PI)) % 360;
-        textoCoordsSpan.textContent = `Rotación: ${grados.toFixed(1)}°`;
+        textoCoordsSpan.textContent = `Dirección: ${yawCorregido.toFixed(1)}° | Avanzado: ${sensorData.distancia.toFixed(2)} cm`;
     }
 }
 
@@ -371,4 +576,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnConectarSensor) btnConectarSensor.addEventListener('click', conectarWebSocketSensor);
     if (btnDesconectarSensor) btnDesconectarSensor.addEventListener('click', desconectarWebSocketSensor);
     if (btnReconectarSensor) btnReconectarSensor.addEventListener('click', reconectarWebSocketSensor);
+});
+
+// --- EVENTO PARA CENTRAR LA FLECHA (TARA) ---
+window.addEventListener('keydown', (evento) => {
+    if (evento.key === 'c' || evento.key === 'C') {
+        yawOffset = sensorData.yaw;
+        console.log("Norte re-calibrado. Nuevo punto cero:", yawOffset);
+        
+        if (textoCoordsSpan) {
+            textoCoordsSpan.style.color = "#00ff00"; 
+            setTimeout(() => { textoCoordsSpan.style.color = ""; }, 500);
+        }
+        
+        moverRobotConSensores();
+    }
 });

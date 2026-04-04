@@ -143,15 +143,20 @@
                     <span id="texto-coords">(esperando...)</span>
                 </p>
             </div>
+<div class="notas-ui" style="padding: 15px;">
+                <h3>Guardar Ubicación con Nota y Fotos</h3>
+                <p>Escribe una nota, adjunta múltiples fotos de la cámara (opcional) y registra la posición. Puedes seleccionar varias imágenes manteniendo presionada Ctrl o Cmd.</p>
+                
+                <input type="file" id="input-foto" accept="image/*" multiple style="margin-bottom: 10px; display: block;" title="Puedes seleccionar múltiples imágenes manteniendo presionada Ctrl o Cmd">
+                
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <input type="text" id="input-nota" placeholder="Ej: Posible víctima localizada..." style="flex: 1; padding: 8px;">
+                    <button id="btn-guardar-nota" style="padding: 8px 15px; cursor: pointer;">Guardar Nota</button>
+                    <button id="btn-exportar" style="padding: 8px 15px; cursor: pointer; background: #17a2b8; color: white; border: none; border-radius: 4px;">Exportar Ruta (CSV)</button>
+                </div>
 
-            <div class="notas-ui">
-                <h3>Guardar Ubicación con Nota</h3>
-                <p>Escribe una nota y presiona 'Guardar' para registrar la posición actual del robot.</p>
-                <input type="text" id="input-nota" placeholder="Ej: Punto de recarga...">
-                <button id="btn-guardar-nota">Guardar Nota</button>
-
-                <h3>Notas Guardadas</h3>
-                <ul id="lista-notas"></ul>
+                <h3>Registro de Hallazgos</h3>
+                <ul id="lista-notas" style="list-style-type: none; padding-left: 0;"></ul>
             </div>
         </div>
     </main>
