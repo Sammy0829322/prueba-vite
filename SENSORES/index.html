@@ -10,6 +10,21 @@
     <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Changa+One:ital@0;1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Estilos para soportar las dos gráficas en el Box 7 sin romper el diseño */
+        .box-seven .chart-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            height: 100%;
+            padding: 10px;
+        }
+        #gasChart, #heartChart {
+            max-height: 48%; /* Ajuste para que quepan ambos canvas */
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+    </style>
 </head>
 
 <body>
@@ -92,18 +107,18 @@
         
         <div class="box-ten">
             <div class="toggle-container">
-        
-                    <div class="toggle">
-                        <input type="checkbox" id="btn-gas">
-                        <label for="btn-gas"></label>
-                    </div>
-                    <span class="toggle-label">Sensor de Gas</span>
+                <div class="toggle">
+                    <input type="checkbox" id="btn-gas">
+                    <label for="btn-gas"></label>
+                </div>
+                <span class="toggle-label">Sensor de Gas</span>
             </div>
         </div>
 
         <div class="box-seven">
             <div class="chart-container">
                 <canvas id="gasChart"></canvas>
+                <canvas id="heartChart"></canvas>
             </div>
         </div>
         
@@ -116,10 +131,26 @@
                 </div>
         </div>
         <div class="box-twelve">9</div>
-        <div class="box-thirteen">13</div>
+
+        <div class="box-thirteen">
+            <div class="toggle-container">
+                <div class="toggle">
+                    <input type="checkbox" id="btn-heart">
+                    <label for="btn-heart"></label>
+                </div>
+                <span class="toggle-label">Sensor Pulso</span>
+            </div>
+            <div style="text-align: center; margin-top: 10px; color: #00ffcc; font-family: 'Changa One';">
+                <span style="font-size: 0.8rem;">SPO2:</span>
+                <span id="spo2-value" style="font-size: 1.2rem;">--%</span>
+            </div>
+        </div>
+
         <div class="box-fourteen">
-            <img src="./assets/corazon.gif" alt="Corazón" width="200px">
-            <h1>99 PPM</h1>
+            <img src="./assets/corazon.gif" alt="Corazón" width="100px">
+            <h1 style="display: inline-block;"><span id="bpm-value">--</span></h1>
+            <h3 style="display: inline-block;">BPM</h3>
+            <p id="bpm-status" style="font-weight: bold; color: #aaa; text-transform: uppercase; font-size: 0.7rem; margin-top: 5px;">SISTEMA OFF</p>
         </div>
 
     </div>
