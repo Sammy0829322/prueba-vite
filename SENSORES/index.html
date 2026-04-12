@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Changa+One:ital@0;1&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./style,.css">
+    <link rel="stylesheet" href="./style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
@@ -32,7 +32,6 @@
                     <button id="btn-desconectar">Desconectar</button>
                     <button id="btn-reconectar">Reconectar</button>
                 </div>
-
                 <div class="botones-conectados">
                     <div class="estado">
                         <h3>Estado:</h3>
@@ -42,16 +41,24 @@
             </header>
         </div>
 
-        <div class="box">
+        <div class="box-three">
             <div class="toggle-container">
                 <div class="toggle">
-                    <input type="checkbox" id="btn-medicion">
-                    <label for="btn-medicion"></label>
+                    <input type="checkbox" id="btn-audio">
+                    <label for="btn-audio"></label>
                 </div>
                 <span class="toggle-label">Micrófono</span>
             </div>
+        </div>
 
-            <div class="toggle-container" style="margin-top: 15px;">
+        <div class="box-four">
+            <div class="chart-container">
+                <canvas id="audioCanvas"></canvas>
+            </div>
+        </div>
+
+        <div class="box-nine">
+              <div class="toggle-container">
                 <div class="toggle">
                     <input type="checkbox" id="btn-radar"> 
                     <label for="btn-radar"></label>
@@ -60,22 +67,15 @@
             </div>
         </div>
 
-        <div class="box-four">
-            <div class="chart-container">
-                <canvas id="gasChart"></canvas>
-            </div>
-        </div>
-
         <div class="box box-radar" id="radar-container">
             <div class="radar-header">
                 <h3>RADAR LD2410B</h3>
-                <div id="radar-status" class="status-pill">DESCONECTADO</div>
             </div>
             <div class="radar-body">
-                <div class="radar-main">
-                    <span id="radar-presencia">SENSOR APAGADO</span>
-                </div>
                 <div class="radar-details">
+                    <div class="radar-item status-item">
+                        <span id="radar-status">OFF</span>
+                    </div>
                     <div class="radar-item">
                         <span class="label">MOV:</span>
                         <span id="radar-dist-mov">--</span> cm
@@ -89,10 +89,38 @@
                 </div>
             </div>
         </div>
+        
+        <div class="box-ten">
+            <div class="toggle-container">
+        
+                    <div class="toggle">
+                        <input type="checkbox" id="btn-gas">
+                        <label for="btn-gas"></label>
+                    </div>
+                    <span class="toggle-label">Sensor de Gas</span>
+            </div>
+        </div>
 
+        <div class="box-seven">
+            <div class="chart-container">
+                <canvas id="gasChart"></canvas>
+            </div>
+        </div>
+        
         <div class="box-six">6</div>
-        <div class="box-seven">7</div>
-        <div class="box">8</div>
+        <div class="box-eight">7</div>
+        <div class="box-eleven">
+            <div class="ppm-display">
+                    <p id="ppm-value">0.00</p>
+                    <h3>PPM</h3>
+                </div>
+        </div>
+        <div class="box-twelve">9</div>
+        <div class="box-thirteen">13</div>
+        <div class="box-fourteen">
+            <img src="./assets/corazon.gif" alt="Corazón" width="200px">
+            <h1>99 PPM</h1>
+        </div>
 
     </div>
 
