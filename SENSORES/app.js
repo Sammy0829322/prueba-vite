@@ -60,8 +60,14 @@ function inicializarGraficaPulso() {
     }
 }
 
-function procesarDatoPulso(val) {
+function procesarDatoPulso(data) {
     if (!heartRateActive) return;
+
+    // --- EL DATO PUEDE VENIR COMO data (objeto completo) o data.val (solo valor) ---
+    // Dependiendo de cómo lo mandes en el socket.onmessage, 
+    // asegúrate de extraer 'val' y 'oxigeno'
+    const val = (typeof data === 'object') ? data.val : data;
+    const oxigeno = (typeof data === 'object') ? data.oxigeno : null;
 
     // 1. Actualizar Historial
     heartHistory.push(val);
@@ -72,7 +78,15 @@ function procesarDatoPulso(val) {
         heartChartInstance.data.datasets[0].data = heartHistory;
         heartChartInstance.update();
     }
-
+    
+    // --- NUEVA LÓGICA: ACTUALIZAR TEXTO DE OXIGENACIÓN ---
+    if (oxigeno !== null) {
+        const spo2Display = document.getElementById('spo2-value');
+        if (spo2Display) {
+            spo2Display.innerText = oxigeno + "%";
+        }
+    }
+     
     // 3. Algoritmo de Detección de Latidos (Cálculo de BPM)
     const min = Math.min(...heartHistory);
     const max = Math.max(...heartHistory);
@@ -283,7 +297,7 @@ function conectarWebSocket() {
                 const data = JSON.parse(event.data);
                 if (data.tipo === "lectura_radar") actualizarInterfazRadar(data);
                 else if (data.tipo === "lectura_gas") actualizarGraficaGas(data.ppm);
-                else if (data.tipo === "heart") procesarDatoPulso(data.val);
+                else if (data.tipo === "heart") procesarDatoPulso(data);
             } catch (e) { console.log("Error JSON:", event.data); }
         }
     };
@@ -354,6 +368,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-radar').addEventListener('change', (e) => {
         socket?.send(e.target.checked ? "RADAR_ON" : "RADAR_OFF");
+        
+        // Mostrar OFF cuando se desactiva el radar
+        if (!e.target.checked) {
+            const elStatus = document.getElementById('radar-status');
+            const elDistMov = document.getElementById('radar-dist-mov');
+            const elEneMov = document.getElementById('radar-ene-mov');
+            const elDistEst = document.getElementById('radar-dist-est');
+            const elEneEst = document.getElementById('radar-ene-est');
+            
+            if (elStatus) {
+                elStatus.textContent = "OFF";
+                elStatus.style.background = "#333";
+            }
+            if (elDistMov) elDistMov.textContent = "--";
+            if (elEneMov) elEneMov.textContent = "0";
+            if (elDistEst) elDistEst.textContent = "--";
+            if (elEneEst) elEneEst.textContent = "0";
+        }
     });
 
     document.getElementById('btn-gas').addEventListener('change', (e) => {
@@ -368,8 +400,23 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-heart').addEventListener('change', (e) => {
         heartRateActive = e.target.checked;
         socket?.send(heartRateActive ? "SENSOR_ON" : "SENSOR_OFF");
+        
+        // Actualizar estado del sistema
+        const elStatus = document.getElementById('bpm-status');
+        if (elStatus) {
+            if (heartRateActive) {
+                elStatus.textContent = "SISTEMA ON";
+                elStatus.style.color = "#2ed573"; // Verde
+            } else {
+                elStatus.textContent = "SISTEMA OFF";
+                elStatus.style.color = "#aaa"; // Gris
+            }
+        }
+        
         if (!heartRateActive) {
             document.getElementById('bpm-value').innerText = "--";
+            bpmSamples = [];
+            if(document.getElementById('spo2-value')) document.getElementById('spo2-value').innerText = "--%";
             bpmSamples = [];
         }
     });
