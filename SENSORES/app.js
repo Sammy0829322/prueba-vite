@@ -253,37 +253,78 @@ function actualizarInterfazRadar(data) {
 // MÓDULO: WEBSOCKET Y CONTROL PRINCIPAL
 // ==========================================
 function conectarWebSocket() {
-    const ip = document.getElementById('ip-input').value.trim();
-    if (!ip) return alert('Ingrese IP');
-
+    const ipInput = document.getElementById('ip-input');
+    const ip = ipInput.value.trim();
+    
+    if (!ip) {
+        alert('Por favor, ingrese una dirección IP');
+        return;
+    }
+    
+    // Si ya hay una conexión, cerrarla primero
+    if (socket && socket.readyState !== WebSocket.CLOSED) {
+        socket.close();
+    }
+    
+    actualizarEstado('conectando', 'Conectando...');
     socket = new WebSocket(`ws://${ip}/ws`);
     socket.binaryType = "arraybuffer";
-
-    socket.onopen = () => actualizarEstado('conectado', 'Conectado');
+    
+    socket.onopen = () => {
+        console.log("Conectado al ESP32 vía WebSocket en IP:", ip);
+        actualizarEstado('conectado', 'Conectado');
+    };
+    
     socket.onmessage = (event) => {
         if (event.data instanceof ArrayBuffer) {
             graficarOndaDeAudio(new Int16Array(event.data));
         } else {
             try {
                 const data = JSON.parse(event.data);
-                const tipo = data.tipo || data.type; // Acepta ambos formatos
-
-                if (tipo === "heart") {
-                    procesarDatoPulso(data.val);
-                } else if (tipo === "lectura_gas") {
-                    actualizarGraficaGas(data.ppm);
-                } else if (tipo === "lectura_radar") {
-                    actualizarInterfazRadar(data);
-                }
+                if (data.tipo === "lectura_radar") actualizarInterfazRadar(data);
+                else if (data.tipo === "lectura_gas") actualizarGraficaGas(data.ppm);
+                else if (data.tipo === "heart") procesarDatoPulso(data.val);
             } catch (e) { console.log("Error JSON:", event.data); }
         }
     };
-    socket.onclose = () => actualizarEstado('desconectado', 'Desconectado');
+    
+    socket.onclose = () => {
+        console.log("WebSocket cerrado");
+        actualizarEstado('desconectado', 'Desconectado');
+        detenerMedicionesGas();
+    };
+    
+    socket.onerror = (error) => {
+        console.error("Error en WebSocket:", error);
+        actualizarEstado('error', 'Error de conexión');
+        alert('Error de conexión. Verifique la IP y que el dispositivo esté encendido.');
+        detenerMedicionesGas();
+    };
+}
+
+function desconectarWebSocket() {
+    if (socket) {
+        socket.close();
+        console.log("WebSocket cerrado manualmente");
+        actualizarEstado('desconectado', 'Desconectado');
+        detenerMedicionesGas();
+    }
+}
+
+function reconectarWebSocket() {
+    conectarWebSocket();
 }
 
 function actualizarEstado(estado, mensaje) {
-    const el = document.getElementById('estado');
-    if (el) { el.className = estado; el.textContent = mensaje; }
+    const estadoElement = document.getElementById('estado');
+    if (estadoElement) {
+        // Eliminar todas las clases de estado
+        estadoElement.classList.remove('conectado', 'desconectado', 'conectando', 'error');
+        
+        // Añadir la clase correspondiente y actualizar el texto
+        estadoElement.textContent = mensaje;
+        estadoElement.classList.add(estado);
+    }
 }
 
 // INICIALIZACIÓN
@@ -292,7 +333,20 @@ document.addEventListener('DOMContentLoaded', () => {
     inicializarGraficaGas();
     inicializarGraficaPulso();
 
-    document.getElementById('btn-conectar').addEventListener('click', conectarWebSocket);
+    // Botones de Conexión
+    const btnConectar = document.getElementById('btn-conectar');
+    const btnDesconectar = document.getElementById('btn-desconectar');
+    const btnReconectar = document.getElementById('btn-reconectar');
+    
+    if (btnConectar) {
+        btnConectar.addEventListener('click', conectarWebSocket);
+    }
+    if (btnDesconectar) {
+        btnDesconectar.addEventListener('click', desconectarWebSocket);
+    }
+    if (btnReconectar) {
+        btnReconectar.addEventListener('click', reconectarWebSocket);
+    }
 
     document.getElementById('btn-audio').addEventListener('change', (e) => {
         socket?.send(e.target.checked ? "AUDIO_ON" : "AUDIO_OFF");
