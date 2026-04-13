@@ -7,29 +7,15 @@
     <title>Sensores OASIS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Changa+One:ital@0;1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Changa+One:ital@0;1&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="./style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        /* Estilos para soportar las dos gráficas en el Box 7 sin romper el diseño */
-        .box-seven .chart-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            height: 100%;
-            padding: 10px;
-        }
-        #gasChart, #heartChart {
-            max-height: 48%; /* Ajuste para que quepan ambos canvas */
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 5px;
-        }
-    </style>
 </head>
 
 <body>
     <div class="container">
-        
+
         <div class="box-one">
             <div class="titulo">
                 <h1>SENSORES O.A.S.I.S</h1>
@@ -67,15 +53,13 @@
         </div>
 
         <div class="box-four">
-            <div class="chart-container">
-                <canvas id="audioCanvas"></canvas>
-            </div>
+            <canvas id="audioCanvas"></canvas>
         </div>
 
         <div class="box-nine">
-              <div class="toggle-container">
+            <div class="toggle-container">
                 <div class="toggle">
-                    <input type="checkbox" id="btn-radar"> 
+                    <input type="checkbox" id="btn-radar">
                     <label for="btn-radar"></label>
                 </div>
                 <span class="toggle-label">Radar Humano</span>
@@ -104,7 +88,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="box-ten">
             <div class="toggle-container">
                 <div class="toggle">
@@ -116,45 +100,46 @@
         </div>
 
         <div class="box-seven">
-            <div class="chart-container">
-                <canvas id="gasChart"></canvas>
-                <canvas id="heartChart"></canvas>
+            <canvas id="gasChart"></canvas>
+
+        </div>
+
+        <div class="box-six">
+            <div class="toggle-container">
+                <div class="toggle">
+                    <input type="checkbox" id="btn-heart">
+                    <label for="btn-heart"></label>
+                </div>
+                <span class="toggle-label">Sensor Pulso</span>
             </div>
         </div>
-        
-        <div class="box-six">6</div>
-        <div class="box-eight">7</div>
+        <div class="box-eight"> <canvas id="heartChart"></canvas></div>
         <div class="box-eleven">
             <div class="ppm-display">
-                    <p id="ppm-value">0.00</p>
-                    <h3>PPM</h3>
-                </div>
+                <h3>PPM</h3>
+                <p id="ppm-value">0.00</p>
+            </div>
         </div>
         <div class="box-twelve">9</div>
 
         <div class="box-thirteen">
-    <div class="toggle-container">
-        <div class="toggle">
-            <input type="checkbox" id="btn-heart">
-            <label for="btn-heart"></label>
+            <div class="oxigenacion-display">
+                <span class="oxigenacion-label">OXIGENACIÓN:</span><br>
+                <span id="spo2-value">--%</span>
+            </div>
         </div>
-        <span class="toggle-label">Sensor Pulso</span>
-    </div>
-    <div style="text-align: center; margin-top: 10px; color: #00ffcc; font-family: 'Changa One';">
-        <span style="font-size: 0.9rem; color: #aaa;">OXIGENACIÓN:</span><br>
-        <span id="spo2-value" style="font-size: 1.8rem; text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);">--%</span>
-    </div>
-</div>
 
         <div class="box-fourteen">
-            <img src="./assets/corazon.gif" alt="Corazón" width="100px">
-            <h1 style="display: inline-block;"><span id="bpm-value">--</span></h1>
-            <h3 style="display: inline-block;">BPM</h3>
-            <p id="bpm-status" style="font-weight: bold; color: #aaa; text-transform: uppercase; font-size: 0.7rem; margin-top: 5px;">SISTEMA OFF</p>
+            <!--  <img src="./assets/corazon.gif" alt="Corazón" width="100px"> -->
+            <div class="bpm-display">
+                <span class="bpm-label">BPM:</span><br>
+                <span id="bpm-value">--</span>
+            </div>
         </div>
 
-    </div>
+    </div>s
 
     <script src="./app.js"></script>
 </body>
+
 </html>

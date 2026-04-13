@@ -11,10 +11,10 @@
 .container {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(17, 1fr);
+    grid-template-rows: repeat(18, 1fr);
     gap: 20px;
     max-width: 1300px;
-    height: 1700px;
+    height: 1800px;
     margin: auto;
 }
 
@@ -84,6 +84,90 @@
     background-color: rgb(33, 166, 207, 0.62);
     border-radius: 10px;
     box-shadow: 0 0 20px rgb(15, 136, 202);
+}
+
+/* Estilos para gráficas adicionales */
+.box-seven .chart-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    height: 100%;
+    padding: 10px;
+}
+
+#gasChart, #heartChart {
+    max-height: 100%;
+    background: black;
+    border-radius: 5px;
+}
+
+/* Estilos para display de oxigenación */
+.box-thirteen {
+    text-align: center;
+    margin-top: 10px;
+    color: #00ffcc;
+    font-family: 'Changa One', sans-serif;
+}
+
+.oxigenacion-label {
+    font-size: 20px;
+    font-weight: bold;
+    color: #aaa;
+    background-color: transparent;
+}
+.bpm-label {
+    font-size: 20px;
+    font-weight: bold;
+    color: #aaa;
+    background-color: transparent;
+}
+
+#spo2-value, #bpm-value {
+    font-size: 1.8rem;
+    text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+    font-weight: bold; 
+    
+    background-color: transparent;
+}
+
+
+/* Estilos para display de BPM */
+.box-fourteen h1 {
+    display: inline-block;
+}
+
+.box-fourteen h3 {
+    display: inline-block;
+}
+
+#bpm-status {
+    font-weight: bold;
+    color: #aaa;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    margin-top: 5px;
+}
+
+/* Estilos para display de PPM */
+.ppm-display {
+    text-align: center;
+    margin-top: 10px;
+    color: #00ffcc;
+    font-family: 'Changa One', sans-serif;
+}
+
+.ppm-display p {
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+.ppm-display h3 {
+    font-size: 1.8rem;
+}
+
+/* Estilos adicionales para box-fourteen */
+.box-fourteen img {
+    width: 100px;
 }
 
 /* COMPONENTES UI */
@@ -280,19 +364,28 @@ small { color: white; font-size: 0.75rem; }
 }
 
 .ppm-display #ppm-value {
-    font-size: 66px; 
-    color: #00ff00; 
+   font-size: 1.8rem;
+    text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+    color: #00ffcc; 
     font-weight: bold; 
     font-family: 'Archivo Black', sans-serif;
     background-color: transparent;
 }
 
 .ppm-display h3 {
-    font-size: 14px; 
-    margin: 0; 
-    color: white;
+  font-size: 20px;
+    font-weight: bold;
+    color: #aaa;
     background-color: transparent;
 }
 .box-fourteen img {
     background-color: transparent;
+}
+.oxigenacion-display {
+    background-color: transparent;
+}
+
+.bpm-display {
+    background-color: transparent;
+    color: #00ffcc;
 }

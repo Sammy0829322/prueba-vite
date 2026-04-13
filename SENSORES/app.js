@@ -47,11 +47,45 @@ function inicializarGraficaPulso() {
                 maintainAspectRatio: false,
                 animation: false,
                 scales: {
-                    x: { display: false },
+                    x: {
+                        display: true,
+                        title: { 
+                            display: true, 
+                            text: 'Tiempo', 
+                            color: 'white', 
+                            font: { size: 14, weight: 'bold' } 
+                        },
+                        ticks: { 
+                            color: 'white', 
+                            maxRotation: 45, 
+                            minRotation: 45, 
+                            autoSkip: true, 
+                            maxTicksLimit: 10, 
+                            padding: 10 
+                        },
+                        grid: { 
+                            color: 'rgba(235, 233, 233, 0.5)', 
+                            drawBorder: true, 
+                            borderColor: 'rgba(235, 233, 233, 0.5)' 
+                        }
+                    },
                     y: { 
                         display: true,
-                        grid: { color: 'rgba(0,0,0,0.1)' },
-                        ticks: { color: 'black' }
+                        title: { 
+                            display: true, 
+                            text: 'Señal IR', 
+                            color: 'white', 
+                            font: { size: 14, weight: 'bold' } 
+                        },
+                        ticks: { 
+                            color: 'white', 
+                            padding: 10 
+                        },
+                        grid: { 
+                            color: 'rgba(235, 233, 233, 0.5)', 
+                            drawBorder: true, 
+                            borderColor: 'rgba(235, 233, 233, 0.5)' 
+                        }
                     }
                 },
                 plugins: { legend: { display: false } }
@@ -211,8 +245,76 @@ function inicializarGraficaGas() {
     if (ctx) {
         gasChartInstance = new Chart(ctx, {
             type: 'line',
-            data: { labels: [], datasets: [{ label: 'PPM Gas LP', data: [], borderColor: 'rgb(12, 1, 16)', borderWidth: 2 }] },
-            options: { responsive: true, maintainAspectRatio: false }
+            data: { 
+                labels: Array(20).fill(""), 
+                datasets: [{ 
+                    label: 'PPM Gas LP', 
+                    data: [], 
+                    borderColor: 'rgb(12, 1, 16)', 
+                    backgroundColor: 'rgba(12, 1, 16, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.1,
+                    pointRadius: 4
+                }] 
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        display: true,
+                        title: { 
+                            display: true, 
+                            text: 'Tiempo', 
+                            color: 'white', 
+                            font: { size: 14, weight: 'bold' } 
+                        },
+                        ticks: { 
+                            color: 'white', 
+                            maxRotation: 45, 
+                            minRotation: 45, 
+                            autoSkip: true, 
+                            maxTicksLimit: 10, 
+                            padding: 10 
+                        },
+                        grid: { 
+                            color: 'rgba(235, 233, 233, 0.5)', 
+                            drawBorder: true, 
+                            borderColor: 'rgba(235, 233, 233, 0.5)' 
+                        }
+                    },
+                    y: {
+                        display: true,
+                        title: { 
+                            display: true, 
+                            text: 'PPM', 
+                            color: 'white', 
+                            font: { size: 14, weight: 'bold' } 
+                        },
+                        ticks: { 
+                            color: 'white', 
+                            padding: 10 
+                        },
+                        grid: { 
+                            color: 'rgba(235, 233, 233, 0.5)', 
+                            drawBorder: true, 
+                            borderColor: 'rgba(235, 233, 233, 0.5)' 
+                        },
+                        min: 0,
+                        max: 10000,
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: { 
+                        display: true, 
+                        labels: { 
+                            color: 'white', 
+                            font: { size: 12 } 
+                        } 
+                    }
+                }
+            }
         });
     }
 }
