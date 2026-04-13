@@ -246,11 +246,12 @@ function inicializarGraficaGas() {
         gasChartInstance = new Chart(ctx, {
             type: 'line',
             data: { 
-                labels: Array(20).fill(""), 
+                // CORRECCIÓN AQUÍ: Inicializar vacío en lugar de Array(20).fill("")
+                labels: [], 
                 datasets: [{ 
                     label: 'PPM Gas LP', 
-                    data: [], 
-                    borderColor: 'rgb(12, 1, 16)', 
+                    data: [], // Ya estaba vacío, se queda igual
+                    borderColor: 'rgb(117, 30, 149)', 
                     backgroundColor: 'rgba(12, 1, 16, 0.1)',
                     borderWidth: 2,
                     tension: 0.1,
