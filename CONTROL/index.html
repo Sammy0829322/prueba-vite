@@ -28,10 +28,30 @@
                 <button id="btn-reconectar">Reconectar</button>
             </div>
         </div>
+
         <div class="botones-conectados">
             <div class="estado">
                 <h3>Estado:</h3>
                 <p id="estado">Desconectado</p>
+            </div>
+        </div>
+
+        <div class="direip">
+            <div class="ip">
+                <h3>Dirección IP Luces</h3>
+                <input type="text" id="ip-luces-input" placeholder="IP Luces" value="192.168.3.4">
+            </div>
+            <div class="btn-conectado">
+                <button id="btn-conectar-luces">Conectar</button>
+                <button id="btn-desconectar-luces">Desconectar</button>
+                <button id="btn-reconectar-luces">Reconectar</button>
+            </div>
+        </div>
+
+        <div class="botones-conectados">
+            <div class="estado">
+                <h3>Estado Luces:</h3>
+                <p id="estado-luces">Desconectado</p>
             </div>
         </div>
 
@@ -45,20 +65,30 @@
                 <button class="btn-atras" onmousedown="enviarComando('atras')" onmouseup="enviarComando('paro')"
                     ontouchstart="enviarComando('atras')" ontouchend="enviarComando('paro')">Atrás</button>
             </div>
-            <div class="btns-luces">
-                <div class="toggle">
-                    <input type="checkbox" id="btn-luz1">
-                    <label for="btn-luz1"></label>
-                </div>
-                <div class="toggle">
-                    <input type="checkbox" id="btn-luz2">
-                    <label for="btn-luz2"></label>
-                </div>
-                <div class="toggle">
-                    <input type="checkbox" id="btn-luz3">
-                    <label for="btn-luz3"></label>
-                </div>
-            </div>
+
+            <div class="seccion-luces">
+    <div class="pinza-card"> <div class="pinza-sombra">
+            <h2>Iluminación Frontal</h2>
+        </div>
+        <div class="control-brillo">
+            <p>Brillo: <span id="textSliderValue">0</span>%</p>
+            <input type="range" id="pwmSlider" min="0" max="255" value="0" class="slider">
+            <button class="btn-pinza" onclick="apagarLED1()" style="background-color: #f44336; margin-top: 10px;">Apagar</button>
+        </div>
+    </div>
+
+    <div class="pinza-card">
+        <div class="pinza-sombra">
+            <h2>Iluminación Lateral</h2>
+        </div>
+        <div class="control-brillo">
+            <p>Brillo: <span id="textSliderValue2">0</span>%</p>
+            <input type="range" id="pwmSlider2" min="0" max="255" value="0" class="slider">
+            <button class="btn-pinza" onclick="apagarLED2()" style="background-color: #f44336; margin-top: 10px;">Apagar</button>
+        </div>
+    </div>
+</div>
+ 
             <div class="btns-izquierda-derecha">
                 <button class="btn-izquierda" onmousedown="enviarComandoServo('izquierda')"
                     onmouseup="enviarComandoServo('stop')" ontouchstart="enviarComandoServo('izquierda')"

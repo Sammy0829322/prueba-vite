@@ -22,17 +22,15 @@ header {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-     width: 70%;
+    width: 70%;
     height: 100px;
-    
 }
 
 .botones-conectados {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-  
-     width: 30%;
+    width: 30%;
     height: 100px;
 }
 .titulo {
@@ -75,12 +73,12 @@ header {
 .btn-conectado {
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     align-items: flex-end;
-    width: 57%;
-    height: 80px;
+    width: 65%;
+    height: 100px;
 
-    padding-bottom: 5px;
+    padding-bottom: 10px;
     background-color:rgb(33, 166, 207, 0.62);
     border-radius: 10px;
     box-shadow: 0 0 20px rgb(15, 136, 202);
@@ -90,28 +88,41 @@ header {
      display: flex;
      flex-direction: column;
     justify-content: center;
-    gap: 10px;
+    gap: 4px;
     align-items: center;
-    width: 57%;
-    height: 80px;
-
-    padding-bottom: 5px;
+    width: 80%;
+    height: 100px;
+    padding: 10px 8px;
     background-color:rgb(33, 166, 207, 0.62);
     border-radius: 10px;
     box-shadow: 0 0 20px rgb(15, 136, 202);
     margin-left: 10px;
-    
+    box-sizing: border-box;
 }
 .estado h3 {
-    font-size: 20px;
+    font-size: 16px;
     color: white;
     background-color: transparent;
+    margin: 0;
+    padding: 2px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
 }
 .estado p {
-    font-size: 20px;
+    font-size: 14px;
     color: red;
     background-color: transparent;
     font-weight: bold;
+    margin: 0;
+    padding: 2px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
 }
 
 /* Estados de conexión con colores */
@@ -152,16 +163,20 @@ header {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 20%;
-    height: 50%;
+    width: 28%;
+    height: 55%;
     background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
+    padding: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .btn-conectado button:hover {
@@ -240,14 +255,22 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: row;
+    flex-direction: column; /* Cambiado de row a column */
+    gap: 15px;              /* Espacio entre elementos */
     width: 40%;
     height: 100%;
-     background-color:rgb(33, 166, 207, 0.62);
+    background-color: rgba(33, 166, 207, 0.62);
     border-radius: 10px;
     box-shadow: 0 0 20px rgb(15, 136, 202);
     margin: 20px 20px;
-    
+    padding: 20px;          /* Espacio interno */
+    color: white;           /* Para que los textos se vean */
+}
+
+/* Estilo para los textos dentro de luces */
+.btns-luces h3, .btns-luces p {
+    background-color: transparent;
+    margin: 0;
 }
 .btns-izquierda-derecha {
     display: flex;
@@ -442,8 +465,58 @@ input[type="checkbox"] {
 
 input:checked + label {
   margin-left: 50px;
-  background: #47c;
+  background: #4477cc;
 }
+
+/* Estilo del Slider */
+.slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 15px;
+    border-radius: 10px;
+    background: #060666; /* Color oscuro del fondo */
+    outline: none;
+    border: 2px solid black;
+}
+
+/* El círculo del slider (Chrome/Safari) */
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #57ed49; /* Verde para que resalte */
+    cursor: pointer;
+    border: 2px solid black;
+}
+
+/* El círculo del slider (Firefox) */
+.slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #57ed49;
+    cursor: pointer;
+    border: 2px solid black;
+}
+
+/* Alineación de la nueva sección de luces */
+.seccion-luces {
+    display: flex;
+    flex-wrap: wrap; /* Si no hay espacio, se pone uno bajo el otro */
+    gap: 15px;
+    justify-content: center;
+    padding: 20px;
+    grid-column: 1 / -1; /* Si usas Grid, esto hace que ocupe todo el ancho */
+}
+
+.control-brillo {
+    padding: 10px;
+    text-align: center;
+}
+
 /* End toggle switch styles */
 
 
