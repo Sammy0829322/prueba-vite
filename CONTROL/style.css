@@ -9,21 +9,37 @@
 }
 header {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: space-evenly;
     align-items: center;
     max-width: 1300px;
-    height: 100px;
-    background-color:rgb(33, 166, 207, 0.62);
+    height: 200px;
     margin: auto;
 
+}
+.IP-1 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 40%;
+    
+}
+.IP-2 {
+    display: flex;
+    width: 100%;
+    height: 40%;
+    justify-content: center;
+    align-items: center;
 }
 
 .direip {
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     width: 70%;
-    height: 100px;
+    height: 100%;
+    gap: 10px;
 }
 
 .botones-conectados {
@@ -31,7 +47,8 @@ header {
     justify-content: center;
     align-items: flex-start;
     width: 30%;
-    height: 100px;
+    height: 100%;
+    background-color: transparent;
 }
 .titulo {
      max-width: 1300px;
@@ -62,7 +79,7 @@ header {
     align-items: center;
     flex-direction: column;
     gap: 10px;
-    width: 43%;
+    width: 47%;
     height: 80px;
       background-color:rgb(33, 166, 207, 0.62);
       border-radius: 10px;
@@ -76,7 +93,7 @@ header {
     gap: 8px;
     align-items: flex-end;
     width: 65%;
-    height: 100px;
+    height: 100%;
 
     padding-bottom: 10px;
     background-color:rgb(33, 166, 207, 0.62);
@@ -91,7 +108,7 @@ header {
     gap: 4px;
     align-items: center;
     width: 80%;
-    height: 100px;
+    height: 100%;
     padding: 10px 8px;
     background-color:rgb(33, 166, 207, 0.62);
     border-radius: 10px;
@@ -112,7 +129,7 @@ header {
     width: 100%;
 }
 .estado p {
-    font-size: 14px;
+    font-size: 18px;
     color: red;
     background-color: transparent;
     font-weight: bold;
@@ -169,7 +186,7 @@ header {
     color: white;
     border: none;
     border-radius: 6px;
-    font-size: 12px;
+    font-size: 15px;
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
@@ -283,8 +300,19 @@ main {
      background-color:rgb(33, 166, 207, 0.62);
     border-radius: 10px;
     box-shadow: 0 0 20px rgb(15, 136, 202);
-    
-   
+}
+.seccion-luces {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    gap: 25px;
+    width: 40%;
+    height: 100%;
+     background-color:rgb(33, 166, 207, 0.62);
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgb(15, 136, 202);
+    margin: 20px;
 }
 .btn-adelante {
     width: 120px;
@@ -354,7 +382,7 @@ main {
     align-items: center;
     width: 24%;
     height: 35%;
-   background-color: rgb(160 209 210);
+   background-color: rgba(160, 209, 210, 0.4);
     color: white;
     border: 1px solid black;
     font-size: 14px;
@@ -502,22 +530,73 @@ input:checked + label {
     border: 2px solid black;
 }
 
-/* Alineación de la nueva sección de luces */
-.seccion-luces {
-    display: flex;
-    flex-wrap: wrap; /* Si no hay espacio, se pone uno bajo el otro */
-    gap: 15px;
-    justify-content: center;
-    padding: 20px;
-    grid-column: 1 / -1; /* Si usas Grid, esto hace que ocupe todo el ancho */
-}
 
 .control-brillo {
     padding: 10px;
     text-align: center;
+    background-color: transparent;
 }
 
 /* End toggle switch styles */
+.luz-card {
+background-color: transparent;
+}
+.luz-titulo h2 {
+    background-color: transparent;
+}
+.luz-card h2 {
+    background-color: rgba(33, 166, 207, 0.62);
+    text-align: center;
+}
+.luz-card p {
+    background-color: transparent;
+}
+.luz-card input {
+    background-color: transparent;
+}
+.luz-card button {
+    background-color: transparent;
+}
+#textSliderValue2, #textSliderValue {
+   background-color: transparent;
+}
+.titulo-pinza {
+    position: absolute;
+    text-align: center;
+}
+.titulo-pinza h2{
+    background-color: transparent;
+     background-color: rgba(33, 166, 207, 0.62);
+     color: white;
+     font-weight: bold;
+
+}
+.engranaje {
+    position: absolute;
+    bottom:-20px;
+    right: -11px;
+    background-color: transparent;
+    transform: rotate(97deg);
+ 
+}
+.engranaje img{
+
+     background-color: transparent;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    text-align: center;
+    padding: 10px;
+}
+
+
+
 
 
 

@@ -61,6 +61,7 @@
   background-color: rgba(62, 60, 155, 0.829);
 
   border-radius: 40px;
+  border: 3px solid #3b82f6;
 
 }
 
@@ -95,8 +96,7 @@
   height: 100%;
 
  border-radius: 40px;
-
-border: 2px solid white;
+border-left: 3px solid #3b82f6;
 
 }
 
@@ -173,6 +173,7 @@ border: 2px solid white;
   height: 40%;
 
   border-radius: 40px;
+   position: relative;
 
 }
 
@@ -189,9 +190,6 @@ border: 2px solid white;
   width: 100%;
 
   height: 10%;
-
- 
-
 }
 
 
@@ -254,7 +252,9 @@ border: 2px solid white;
 
   color:black;
 
-  font-size: 20px;
+  font-size: 24px;
+  font-weight: bold;
+    z-index: 2;
 
 }
 
@@ -263,6 +263,110 @@ border: 2px solid white;
 .menu a:hover {
 
   color:rgb(255, 255, 255);
-
 } 
+
+.menu1 h3 {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+}
+.gif-ubicacion {
+  position: absolute;
+  top: 2px;
+  right: 22px;
+}
+
+.gif-corazon {
+  position: absolute;
+  top: 25px;
+  left: 206px;
+}
+
+
+
+.gif-control {
+  position: absolute;
+  top: 25px;
+  left: 50px;
+}
+.footer-oasis {
+   
+    color: #cbd5e1;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 10px 0 20px 0;
+    border-top: 3px solid #3b82f6; /* Línea de acento azul */
+}
+
+.footer-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 0 20px;
+}
+
+.footer-section {
+    flex: 1;
+    min-width: 250px;
+    margin-bottom: -21px;
+    margin-left: 66px;
+}
+
+.footer-logo {
+    color: #ffffff;
+    font-size: 24px;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.badge-2026 {
+    background: #1e293b;
+    border: 1px solid #3b82f6;
+    color: #3b82f6;
+    padding: 4px 8px;
+    font-size: 12px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.footer-section h3 {
+    color: #f8fafc;
+    font-size: 18px;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+.footer-section p {
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 5px 0;
+}
+
+.status-indicator {
+    margin-top: 15px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+}
+
+.dot {
+    height: 8px;
+    width: 8px;
+    background-color: #22c55e; /* Verde activo */
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+    box-shadow: 0 0 8px #22c55e;
+}
+
+.footer-bottom {
+    text-align: center;
+    border-top: 1px solid #334155;
+    margin-top: 30px;
+    padding-top: 20px;
+    font-size: 12px;
+    color: #64748b;
+}
 
