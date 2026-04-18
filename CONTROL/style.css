@@ -236,11 +236,8 @@ main {
     flex-direction: column;
     width: 100%;
     height: 10%;
-     background-color:rgb(33, 166, 207, 0.62);
     border-radius: 10px;
-    box-shadow: 0 0 20px rgb(15, 136, 202);
     margin: 20px 0px 20px 0px;
-  
 }
 .pinza {
     display: flex;
@@ -583,16 +580,42 @@ background-color: transparent;
 
      background-color: transparent;
 }
-
-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
+.camara {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     width: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    height: 40%;
+   background-color: transparent;
+    
+}
+.camara-card1 {
+    background-color: transparent;
+    width: 100%;
+    height: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+.camara-card2 {
+    background-color: transparent;
+    width: 100%;
+    height: 36%;
+    display: flex;
+}
+.camara-card3 {
+    background-color: transparent;
+    width: 100%;
+    height: 40%;
+      background-color:rgb(33, 166, 207, 0.62);
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgb(15, 136, 202);
+}
+.camara-card1 h2 {
+    background-color: transparent;
     color: white;
-    text-align: center;
-    padding: 10px;
+    font-weight: bold;
 }
 
 
