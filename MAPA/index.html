@@ -45,16 +45,16 @@
     <div class="box-three">
       <div class="datos-sensores">
         <div class="sensor-item">
-          <h4>Acelerómetro</h4>
-          <p id="datos-accel">X: 0.00°, Y: 0.00°, Z: 0.00°</p>
+          <h4>Yaw</h4>
+          <p id="datos-accel">0.00°</p>
         </div>
         <div class="sensor-item">
-          <h4>Giroscopio</h4>
-          <p id="datos-gyro">X: 0.00°, Y: 0.00°, Z: 0.00°</p>
+          <h4>Pitch</h4>
+          <p id="datos-gyro">0.00°</p>
         </div>
         <div class="sensor-item">
-          <h4>Temperatura</h4>
-          <p id="datos-temp">0.0°C</p>
+          <h4>Roll</h4>
+          <p id="datos-temp">0.00°</p>
         </div>
       </div>
     </div>
@@ -75,11 +75,20 @@
       </div>
     </div>
     
-    <div class="box-six">
+   <div class="box-six">
       <div class="notas-ui">
         <h3>Guardar Ubicación con Notas y Fotos</h3>
-        <p>Escribe una nota, adjunta múltiples fotos y registra la posición.</p>
+        <p>Escribe una nota, selecciona el tipo de hallazgo, adjunta fotos y registra la posición.</p>
         
+        <select id="select-tipo-pin">
+          <option value="0xff0000">🔴 Zona de Riesgo</option>
+          <option value="0x0000ff">🔵 Persona con Vida</option>
+          <option value="0xffff00">🟡 Zona de Difícil Acceso</option>
+          <option value="0x000000">⚫ Persona Fallecida</option>
+          <option value="0x800080">🟣 No Hay Paso por esa Zona</option>
+          <option value="0xffffff">⚪ Observación / Relevante</option>
+        </select>
+
         <input type="file" id="input-foto" accept="image/*" multiple title="Puedes seleccionar múltiples imágenes">
         
         <div class="input-nota-container">

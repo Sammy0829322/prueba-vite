@@ -2,9 +2,10 @@
 import './style.css'; 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 // --- VARIABLES GLOBALES DE ESTADO ---
 let moveDirection = 1; 
+let pinSeleccionadoActual = null; // Guarda el pin que se hizo clic
 
 // --- VARIABLES WEBSOCKET PARA SENSORES ---
 let socketSensor = null;
@@ -104,28 +105,42 @@ crearEtiqueta3D("Izq -50 cm", -5, 0.2, 0);
 crearEtiqueta3D("Izq -100 cm", -10, 0.2, 0);
 crearEtiqueta3D("Altura +50 cm", 0, 5, 0);
 
-// 7. El Robot (AHORA ES UNA FLECHA 3D)
+// 7. El Robot (AHORA ES UN MODELO 3D REAL)
 robot = new THREE.Group(); 
+scene.add(robot); // Añadimos el "contenedor" vacío a la escena desde el principio
 
-const materialRojo = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+// Creamos el cargador
+const loader = new GLTFLoader();
 
-// 7.1 Cuerpo de la flecha (Rectángulo)
-const cuerpoGeo = new THREE.BoxGeometry(0.8, 0.3, 2);
-const cuerpo = new THREE.Mesh(cuerpoGeo, materialRojo);
-cuerpo.position.z = 1; 
+// Cargamos el archivo (asegúrate de tener tu archivo .glb en tu carpeta de proyecto)
+loader.load(
+    './assets/vehicle.glb', // <-- CAMBIA ESTO POR LA RUTA DE TU ARCHIVO
+    function (gltf) {
+        const modeloVehiculo = gltf.scene;
 
-// 7.2 Punta de la flecha (Cono)
-const puntaGeo = new THREE.ConeGeometry(0.8, 1.5, 16);
-const punta = new THREE.Mesh(puntaGeo, materialRojo);
-punta.rotation.x = -Math.PI / 2; 
-punta.position.z = -0.75; 
+        // --- AJUSTES COMUNES (descomenta si los necesitas) ---
+        // 1. Si el modelo es gigante o minúsculo:
+        // modeloVehiculo.scale.set(0.5, 0.5, 0.5); 
+        
+        // 2. Si el modelo aparece enterrado en el piso o volando:
+        // modeloVehiculo.position.y = 0; 
 
-// Unimos las piezas al grupo principal
-robot.add(cuerpo);
-robot.add(punta);
+        // 3. Si el modelo está mirando hacia atrás o de lado (rotar 90 o 180 grados):
+        // modeloVehiculo.rotation.y = Math.PI; // Gira 180 grados
 
-robot.position.y = 0.5; 
-scene.add(robot);
+        // Añadimos el modelo real al grupo 'robot'
+        robot.add(modeloVehiculo);
+        console.log("¡Vehículo 3D cargado exitosamente!");
+    },
+    // Función que se ejecuta mientras se descarga (útil para modelos pesados)
+    function (xhr) {
+        console.log((xhr.loaded / xhr.total * 100) + '% cargado');
+    },
+    // Función en caso de error
+    function (error) {
+        console.error('Error al cargar el modelo 3D:', error);
+    }
+);
 
 // 8. El Rastro (Se inicializa con la posición 0,0,0)
 const pathPoints = [];
@@ -140,13 +155,17 @@ pathLine = new THREE.Line(pathGeometry, pathMaterial);
 scene.add(pathLine);
 
 // Función para crear un Pin 3D (Icono de Ubicación)
-function crearPinUbicacion3D(posicion) {
+// Función para crear un Pin 3D (Icono de Ubicación)
+function crearPinUbicacion3D(posicion, colorHex) { 
     const coneGeometry = new THREE.ConeGeometry(0.15, 0.6, 16); 
     const sphereGeometry = new THREE.SphereGeometry(0.2, 16, 16);
     
-    const pinMaterial = new THREE.MeshStandardMaterial({ color: 0xe74c3c });
+    // Convertimos el texto (ej. "0xff0000") a un número que Three.js pueda leer
+    const colorPin = Number(colorHex);
+
+    const pinMaterial = new THREE.MeshStandardMaterial({ color: colorPin });
     const pinMaterialHover = new THREE.MeshStandardMaterial({ 
-        color: 0xe74c3c,
+        color: colorPin,
         emissive: 0xffffff, 
         emissiveIntensity: 0.3 
     });
@@ -242,12 +261,18 @@ document.addEventListener("DOMContentLoaded", () => {
     inputFoto.multiple = true;
 
     if (btnGuardarNota && inputNota && listaNotas) {
+       if (btnGuardarNota && inputNota && listaNotas) {
         btnGuardarNota.addEventListener('click', () => {
             const textoNota = inputNota.value;
             if (textoNota.trim() === "") {
                 alert("Por favor, escribe una nota antes de guardar.");
                 return;
             }
+
+            // NUEVO: Capturar el color y el nombre de la categoría del Select
+            const selectPin = document.getElementById('select-tipo-pin');
+            const colorSeleccionado = selectPin.value; // ej: "0xff0000"
+            const textoCategoria = selectPin.options[selectPin.selectedIndex].text; // ej: "🔴 Zona de Riesgo"
 
             const pos = robot.position.clone(); 
             
@@ -266,14 +291,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     const archivo = inputFoto.files[i];
                     const urlImagen = URL.createObjectURL(archivo);
                     imagenesUrls.push(urlImagen);
-                    // Crea una miniatura de 100px de ancho con click para ampliar
                     etiquetaImagen += `<img src="${urlImagen}" style="max-width: 100px; height: 80px; border-radius: 4px; margin: 2px; border: 1px solid #ccc; cursor: pointer; object-fit: cover;" onclick="verImagenGrande('${urlImagen}')" title="Click para ver más grande">`;
                 }
                 etiquetaImagen += '</div>';
             }
             // -----------------------------
 
-            const pin3D = crearPinUbicacion3D(pos); 
+            // PASAMOS EL COLOR AL PIN 3D
+            const pin3D = crearPinUbicacion3D(pos, colorSeleccionado); 
 
             const nuevoItemLista = document.createElement('li');
             nuevoItemLista.style.marginBottom = "15px";
@@ -282,25 +307,76 @@ document.addEventListener("DOMContentLoaded", () => {
             nuevoItemLista.style.border = "2px solid #e2e4ea";
             nuevoItemLista.style.borderRadius = "7px";
             
-            // Insertamos texto, coordenadas y la imagen (si existe)
+            // Convertimos "0xff0000" a "#ff0000" para usarlo en CSS
+            const cssColor = colorSeleccionado.replace('0x', '#');
+
+            // Insertamos texto, coordenadas, etiqueta de categoría e imagen
             nuevoItemLista.innerHTML = `
-                <strong>${textoNota}</strong><br>
+                <div style="margin-bottom: 5px; font-size: 0.85em; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 4px; display: inline-block;">
+                    <span style="color: ${cssColor}; font-weight: bold;">${textoCategoria}</span>
+                </div><br>
+                <strong style="font-size: 1.1em;">${textoNota}</strong><br>
                 <span class="coord-guardada" style="color: #f4f0f0; font-size: 0.9em;">(${textoPosicion})</span>
                 ${etiquetaImagen}
             `;
+// --- EVENTOS DEL ITEM DE LA LISTA ---
 
+            // 1. CLICK: Alterna la selección (Seleccionar / Deseleccionar)
+            nuevoItemLista.addEventListener('click', () => {
+                
+                // CASO A: Hicimos clic en la nota que YA estaba seleccionada
+                if (pinSeleccionadoActual === pin3D) {
+                    // Limpiamos la variable global
+                    pinSeleccionadoActual = null;
+                    
+                    // Como el mouse sigue encima de la nota al hacer clic, 
+                    // lo dejamos en tamaño "Hover" (1.5) en lugar de "Seleccionado" (1.8)
+                    pin3D.scale.set(1.5, 1.5, 1.5); 
+                    
+                } 
+                // CASO B: Seleccionamos una nota nueva
+                else {
+                    // Si había un pin seleccionado ANTES, lo devolvemos a la normalidad (1.0)
+                    if (pinSeleccionadoActual) {
+                        pinSeleccionadoActual.scale.set(1, 1, 1);
+                        pinSeleccionadoActual.children.forEach(child => {
+                            child.material = pinSeleccionadoActual.userData.materialNormal;
+                        });
+                    }
+
+                    // Marcamos este pin como el nuevo seleccionado
+                    pinSeleccionadoActual = pin3D;
+
+                    // Aplicamos el tamaño máximo de "Seleccionado" (1.8)
+                    pin3D.scale.set(1.8, 1.8, 1.8); 
+                    pin3D.children.forEach(child => {
+                        child.material = pin3D.userData.materialHover;
+                    });
+                }
+            });
+
+            // 2. MOUSEOVER: Resalta temporalmente
             nuevoItemLista.addEventListener('mouseover', () => {
-                pin3D.scale.set(1.5, 1.5, 1.5);
-                pin3D.children.forEach(child => {
-                    child.material = pin3D.userData.materialHover;
-                });
+                nuevoItemLista.style.cursor = "pointer"; // Cambia el cursor a una manito
+                
+                // Solo lo agrandamos a 1.5 si NO está seleccionado actualmente (que estaría en 1.8)
+                if (pinSeleccionadoActual !== pin3D) {
+                    pin3D.scale.set(1.5, 1.5, 1.5);
+                    pin3D.children.forEach(child => {
+                        child.material = pin3D.userData.materialHover;
+                    });
+                }
             });
             
+            // 3. MOUSEOUT: Quita el resaltado al quitar el cursor
             nuevoItemLista.addEventListener('mouseout', () => {
-                pin3D.scale.set(1, 1, 1);
-                pin3D.children.forEach(child => {
-                    child.material = pin3D.userData.materialNormal;
-                });
+                // Solo lo achicamos si NO es el pin seleccionado
+                if (pinSeleccionadoActual !== pin3D) {
+                    pin3D.scale.set(1, 1, 1);
+                    pin3D.children.forEach(child => {
+                        child.material = pin3D.userData.materialNormal;
+                    });
+                }
             });
 
             listaNotas.prepend(nuevoItemLista); 
@@ -309,6 +385,7 @@ document.addEventListener("DOMContentLoaded", () => {
             inputNota.value = "";
             if(inputFoto) inputFoto.value = ""; 
         });
+    }
     }
 
     // --- NUEVO: FUNCIÓN PARA EXPORTAR LA RUTA A CSV ---
@@ -529,14 +606,13 @@ function moverRobotConSensores() {
     // 2. APLICAR MOVIMIENTO FÍSICO
     let deltaDistancia = sensorData.distancia - lastDistancia;
 
-    if (deltaDistancia < 0) {
-        lastDistancia = sensorData.distancia;
-        deltaDistancia = 0;
-    }
-
-    if (deltaDistancia > 0) {
+    // Validamos que haya un cambio en la distancia (positivo o negativo)
+    // Usamos un pequeño margen (0.1) para evitar que el "ruido" del sensor cree miles de puntos estáticos
+    if (Math.abs(deltaDistancia) > 0.1) {
         const escalaMovimiento = 0.1; 
         
+        // Si deltaDistancia es positivo, (-deltaDistancia) es negativo -> avanza.
+        // Si deltaDistancia es negativo, (-deltaDistancia) es positivo -> retrocede.
         robot.translateZ(-deltaDistancia * escalaMovimiento);
 
         // 3. DIBUJAR EL RASTRO 
@@ -545,11 +621,12 @@ function moverRobotConSensores() {
         pathGeometry = new THREE.BufferGeometry().setFromPoints(pathPoints);
         pathLine.geometry = pathGeometry;
 
+        // Actualizamos la última distancia registrada
         lastDistancia = sensorData.distancia;
     }
 
     if (textoCoordsSpan) {
-        textoCoordsSpan.textContent = `Dirección: ${yawCorregido.toFixed(1)}° | Avanzado: ${sensorData.distancia.toFixed(2)} cm`;
+        textoCoordsSpan.textContent = `Dirección: ${yawCorregido.toFixed(1)}° | Distancia actual: ${sensorData.distancia.toFixed(2)} cm`;
     }
 }
 
