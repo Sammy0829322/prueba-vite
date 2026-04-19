@@ -370,3 +370,97 @@ border-left: 3px solid #3b82f6;
     color: #64748b;
 }
 
+/* Esto aplica SOLO si la pantalla mide menos de 950px de ancho Y además está acostada */
+@media screen and (max-width: 950px) and (orientation: landscape) {
+    .parent {
+        /* Tus estilos para el celular horizontal */
+        width: 700px;
+        height: 250px; 
+        
+  margin-top: 20px;
+
+  margin-right: 5px;
+
+  margin-left: 40px;
+
+  margin-bottom: 50px;
+
+    }
+
+    .child-right img{
+      width: 230px;
+      height: 230px;
+    }
+
+    .titulo h1 {
+      font-size: 34px;
+      margin-bottom: 10px;
+    }
+   .subtitulo h3 {
+    color: white;
+    font-size: 1.2rem;
+}
+.menu1 h3 {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+.subtitulo {
+    margin-bottom: 20px;
+}
+.menu1{
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+menu a{
+ font-size: 1.2rem;
+    font-weight: bold;
+}
+.gif-control {
+    position: absolute;
+    top: 15px;
+    left: 30px;
+}
+.gif-control img{
+    width: 50px;
+   
+}
+
+.gif-corazon {
+    position: absolute;
+    top: 15px;
+    left: 120px;
+}
+.gif-corazon img{
+    width: 100px;
+    
+}
+
+.gif-ubicacion {
+    position: absolute;
+    top: 10px;
+    right: 25px;
+}
+.gif-ubicacion img{
+    width:70px;
+    
+}
+.footer-logo {
+    color: #ffffff;
+    font-size: 17px;
+    letter-spacing: 2px;
+     margin-bottom: none; 
+}
+.footer-section h3 {
+    color: #f8fafc;
+    font-size: 16px;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+.footer-section {
+    flex: 1;
+    min-width: 137px;
+    margin-bottom: -21px;
+    margin-left: none;
+}
+}

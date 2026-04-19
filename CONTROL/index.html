@@ -4,12 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Control O.A.S.I.S</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Changa+One:ital@0;1&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Changa+One:ital@0;1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./style.css">
+    <link rel="icon" href="./assets/engranaje-2.png">
 </head>
 
 <body>
@@ -19,11 +19,10 @@
     </div>
 
     <header>
-
         <div class="IP-1">
             <div class="direip">
                 <div class="ip">
-                    <h3>Escribe la direccion IP</h3>
+                    <h3>Escribe la direccion IP (Robot)</h3>
                     <input type="text" id="ip-input" placeholder="Direccion IP" value="192.168.3.3">
                 </div>
 
@@ -36,7 +35,7 @@
 
             <div class="botones-conectados">
                 <div class="estado">
-                    <h3>Estado:</h3>
+                    <h3>Estado Robot:</h3>
                     <p id="estado">Desconectado</p>
                 </div>
             </div>
@@ -63,13 +62,10 @@
                 </div>
             </div>
         </div>
-
     </header>
 
     <main>
-
         <div class="controles">
-
             <div class="btns-adelante-atras">
                 <button class="btn-adelante" onmousedown="enviarComando('adelante')" onmouseup="enviarComando('paro')"
                     ontouchstart="enviarComando('adelante')" ontouchend="enviarComando('paro')">Adelante</button>
@@ -78,7 +74,6 @@
             </div>
 
             <div class="seccion-luces">
-
                 <div class="luz-card">
                     <div class="luz-titulo">
                         <h2>Iluminación Frontal</h2>
@@ -86,8 +81,7 @@
                     <div class="control-brillo">
                         <p>Brillo: <span id="textSliderValue">0</span>%</p>
                         <input type="range" id="pwmSlider" min="0" max="255" value="0" class="slider">
-                        <button class="btn-pinza" onclick="apagarLED1()"
-                            style="background-color:#f44336;margin-top:10px;">Apagar</button>
+                        <button class="btn-pinza" onclick="apagarLED1()" style="background-color:#f44336;margin-top:10px;">Apagar</button>
                     </div>
                 </div>
 
@@ -98,33 +92,29 @@
                     <div class="control-brillo">
                         <p>Brillo: <span id="textSliderValue2">0</span>%</p>
                         <input type="range" id="pwmSlider2" min="0" max="255" value="0" class="slider">
-                        <button class="btn-pinza" onclick="apagarLED2()"
-                            style="background-color:#f44336;margin-top:10px;">Apagar</button>
+                        <button class="btn-pinza" onclick="apagarLED2()" style="background-color:#f44336;margin-top:10px;">Apagar</button>
                     </div>
                 </div>
-
             </div>
 
             <div class="btns-izquierda-derecha">
-                <button class="btn-izquierda" onmousedown="enviarComandoServo('izquierda')"
-                    onmouseup="enviarComandoServo('stop')" ontouchstart="enviarComandoServo('izquierda')"
-                    ontouchend="enviarComandoServo('stop')">Izquierda</button>
-                <button class="btn-derecha" onmousedown="enviarComandoServo('derecha')"
-                    onmouseup="enviarComandoServo('stop')" ontouchstart="enviarComandoServo('derecha')"
-                    ontouchend="enviarComandoServo('stop')">Derecha</button>
+                <button class="btn-izquierda" onmousedown="enviarComandoServo('izquierda')" onmouseup="enviarComandoServo('stop')" 
+                    ontouchstart="enviarComandoServo('izquierda')" ontouchend="enviarComandoServo('stop')">Izquierda</button>
+                <button class="btn-derecha" onmousedown="enviarComandoServo('derecha')" onmouseup="enviarComandoServo('stop')" 
+                    ontouchstart="enviarComandoServo('derecha')" ontouchend="enviarComandoServo('stop')">Derecha</button>
             </div>
-
         </div>
 
         <div class="camara">
             <div class="camara-card1">
                 <h2>Camara</h2>
             </div>
+            
             <div class="camara-card2">
                 <div class="direip">
                     <div class="ip">
                         <h3>Dirección IP Camara</h3>
-                        <input type="text" id="ip-camara-input" placeholder="IP Camara" value="192.168.3.4">
+                        <input type="text" id="ip-camara-input" placeholder="IP Camara" value="192.168.3.5">
                     </div>
 
                     <div class="btn-conectado">
@@ -136,163 +126,103 @@
 
                 <div class="botones-conectados">
                     <div class="estado">
-                        <h3>Estado Luces:</h3>
-                        <p id="estado-luces">Desconectado</p>
+                        <h3>Estado Cámara:</h3>
+                        <p id="estado-camara">Desconectado</p>
                     </div>
                 </div>
-
             </div>
-            <div class="camara-card3"></div>
 
-
+            <div class="camara-card3">
+                <div class="estabilizacion">
+                    <button id="btn-activar-pid">Activar estabilizacion</button>
+                    <button id="btn-desactivar-pid">Desactivar estabilizacion</button>
+                </div>
+                <div class="control-direccion">
+                    <div class="titulo-camara">
+                        <h3>Control de Dirección Manual</h3>
+                    </div>
+                    <div class="slider-container">
+                    <div class="slider-control">
+                        <label for="slider-x">PAN: <span id="valor-x">90</span></label>
+                        <input type="range" id="slider-x" min="0" max="180" value="90" class="slider-direccion">
+                    </div>
+                    <div class="slider-control">
+                        <label for="slider-y">TILT: <span id="valor-y">90</span></label>
+                        <input type="range" id="slider-y" min="0" max="180" value="90" class="slider-direccion">
+                    </div>
+                    <div class="slider-control">
+                        <label for="slider-z">ROLL: <span id="valor-z">90</span></label>
+                        <input type="range" id="slider-z" min="0" max="180" value="90" class="slider-direccion">
+                    </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="pinza">
             <div class="titulo-pinza">
                 <h2>Pinza robotica</h2>
             </div>
+            
             <div class="pinza-card">
-                <div class="pinza-sombra">
-                    <h2>Base</h2>
-                </div>
-                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo2','bajar')"
-                    onmouseup="enviarComandoServoPinza('servo2','stop')"
-                    ontouchstart="enviarComandoServoPinza('servo2','bajar')"
-                    ontouchend="enviarComandoServoPinza('servo2','stop')">Izquierda</button>
-                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo2','subir')"
-                    onmouseup="enviarComandoServoPinza('servo2','stop')"
-                    ontouchstart="enviarComandoServoPinza('servo2','subir')"
-                    ontouchend="enviarComandoServoPinza('servo2','stop')">Derecha</button>
-                <div class="engranaje">
-                    <img src="./assets/engranaje-2.png" alt="engranaje" width="100px">
-                </div>
+                <div class="pinza-sombra"><h2>Base</h2></div>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo2','bajar')" onmouseup="enviarComandoServoPinza('servo2','stop')" ontouchstart="enviarComandoServoPinza('servo2','bajar')" ontouchend="enviarComandoServoPinza('servo2','stop')">Izquierda</button>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo2','subir')" onmouseup="enviarComandoServoPinza('servo2','stop')" ontouchstart="enviarComandoServoPinza('servo2','subir')" ontouchend="enviarComandoServoPinza('servo2','stop')">Derecha</button>
+                <div class="engranaje"><img src="./assets/engranaje-2.png" alt="engranaje" width="100px"></div>
             </div>
 
             <div class="pinza-card">
-                <div class="pinza-sombra">
-                    <h2>Hombro</h2>
-                </div>
-                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo3','bajar')"
-                    onmouseup="enviarComandoServoPinza('servo3','stop')"
-                    ontouchstart="enviarComandoServoPinza('servo3','bajar')"
-                    ontouchend="enviarComandoServoPinza('servo3','stop')">Bajar</button>
-                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo3','subir')"
-                    onmouseup="enviarComandoServoPinza('servo3','stop')"
-                    ontouchstart="enviarComandoServoPinza('servo3','subir')"
-                    ontouchend="enviarComandoServoPinza('servo3','stop')">Subir</button>
-                <div class="engranaje">
-                    <img src="./assets/engranaje-2.png" alt="engranaje" width="100px">
-                </div>
+                <div class="pinza-sombra"><h2>Hombro</h2></div>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo3','bajar')" onmouseup="enviarComandoServoPinza('servo3','stop')" ontouchstart="enviarComandoServoPinza('servo3','bajar')" ontouchend="enviarComandoServoPinza('servo3','stop')">Bajar</button>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo3','subir')" onmouseup="enviarComandoServoPinza('servo3','stop')" ontouchstart="enviarComandoServoPinza('servo3','subir')" ontouchend="enviarComandoServoPinza('servo3','stop')">Subir</button>
+                <div class="engranaje"><img src="./assets/engranaje-2.png" alt="engranaje" width="100px"></div>
             </div>
 
             <div class="pinza-card">
-                <div class="pinza-sombra">
-                    <h2>Extensión 1</h2>
-                </div>
-                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo4','bajar')"
-                    onmouseup="enviarComandoServoPinza('servo4','stop')"
-                    ontouchstart="enviarComandoServoPinza('servo4','bajar')"
-                    ontouchend="enviarComandoServoPinza('servo4','stop')">Extender</button>
-                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo4','subir')"
-                    onmouseup="enviarComandoServoPinza('servo4','stop')"
-                    ontouchstart="enviarComandoServoPinza('servo4','subir')"
-                    ontouchend="enviarComandoServoPinza('servo4','stop')">Retraer</button>
-                <div class="engranaje">
-                    <img src="./assets/engranaje-2.png" alt="engranaje" width="100px">
-                </div>
+                <div class="pinza-sombra"><h2>Extensión 1</h2></div>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo4','bajar')" onmouseup="enviarComandoServoPinza('servo4','stop')" ontouchstart="enviarComandoServoPinza('servo4','bajar')" ontouchend="enviarComandoServoPinza('servo4','stop')">Extender</button>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo4','subir')" onmouseup="enviarComandoServoPinza('servo4','stop')" ontouchstart="enviarComandoServoPinza('servo4','subir')" ontouchend="enviarComandoServoPinza('servo4','stop')">Retraer</button>
+                <div class="engranaje"><img src="./assets/engranaje-2.png" alt="engranaje" width="100px"></div>
             </div>
 
             <div class="pinza-card">
-                <div class="pinza-sombra">
-                    <h2>Extensión 2</h2>
-                </div>
-                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo5','bajar')"
-                    onmouseup="enviarComandoServoPinza('servo5','stop')"
-                    ontouchstart="enviarComandoServoPinza('servo5','bajar')"
-                    ontouchend="enviarComandoServoPinza('servo5','stop')">Extender</button>
-                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo5','subir')"
-                    onmouseup="enviarComandoServoPinza('servo5','stop')"
-                    ontouchstart="enviarComandoServoPinza('servo5','subir')"
-                    ontouchend="enviarComandoServoPinza('servo5','stop')">Retraer</button>
-                <div class="engranaje">
-                    <img src="./assets/engranaje-2.png" alt="engranaje" width="100px">
-                </div>
+                <div class="pinza-sombra"><h2>Extensión 2</h2></div>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo5','bajar')" onmouseup="enviarComandoServoPinza('servo5','stop')" ontouchstart="enviarComandoServoPinza('servo5','bajar')" ontouchend="enviarComandoServoPinza('servo5','stop')">Extender</button>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo5','subir')" onmouseup="enviarComandoServoPinza('servo5','stop')" ontouchstart="enviarComandoServoPinza('servo5','subir')" ontouchend="enviarComandoServoPinza('servo5','stop')">Retraer</button>
+                <div class="engranaje"><img src="./assets/engranaje-2.png" alt="engranaje" width="100px"></div>
             </div>
 
             <div class="pinza-card">
-                <div class="pinza-sombra">
-                    <h2>Muñeca</h2>
-                </div>
-                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo6','bajar')"
-                    onmouseup="enviarComandoServoPinza('servo6','stop')"
-                    ontouchstart="enviarComandoServoPinza('servo6','bajar')"
-                    ontouchend="enviarComandoServoPinza('servo6','stop')">Giro Izq</button>
-                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo6','subir')"
-                    onmouseup="enviarComandoServoPinza('servo6','stop')"
-                    ontouchstart="enviarComandoServoPinza('servo6','subir')"
-                    ontouchend="enviarComandoServoPinza('servo6','stop')">Giro Der</button>
-                <div class="engranaje">
-                    <img src="./assets/engranaje-2.png" alt="engranaje" width="100px">
-                </div>
+                <div class="pinza-sombra"><h2>Muñeca</h2></div>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo6','bajar')" onmouseup="enviarComandoServoPinza('servo6','stop')" ontouchstart="enviarComandoServoPinza('servo6','bajar')" ontouchend="enviarComandoServoPinza('servo6','stop')">Giro Izq</button>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo6','subir')" onmouseup="enviarComandoServoPinza('servo6','stop')" ontouchstart="enviarComandoServoPinza('servo6','subir')" ontouchend="enviarComandoServoPinza('servo6','stop')">Giro Der</button>
+                <div class="engranaje"><img src="./assets/engranaje-2.png" alt="engranaje" width="100px"></div>
             </div>
 
             <div class="pinza-card">
-                <div class="pinza-sombra">
-                    <h2>Pinza</h2>
-                </div>
-                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo7','bajar')"
-                    onmouseup="enviarComandoServoPinza('servo7','stop')"
-                    ontouchstart="enviarComandoServoPinza('servo7','bajar')"
-                    ontouchend="enviarComandoServoPinza('servo7','stop')">Abrir</button>
-                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo7','subir')"
-                    onmouseup="enviarComandoServoPinza('servo7','stop')"
-                    ontouchstart="enviarComandoServoPinza('servo7','subir')"
-                    ontouchend="enviarComandoServoPinza('servo7','stop')">Cerrar</button>
-                <div class="engranaje">
-                    <img src="./assets/engranaje-2.png" alt="engranaje" width="100px">
-                </div>
+                <div class="pinza-sombra"><h2>Pinza</h2></div>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo7','bajar')" onmouseup="enviarComandoServoPinza('servo7','stop')" ontouchstart="enviarComandoServoPinza('servo7','bajar')" ontouchend="enviarComandoServoPinza('servo7','stop')">Abrir</button>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo7','subir')" onmouseup="enviarComandoServoPinza('servo7','stop')" ontouchstart="enviarComandoServoPinza('servo7','subir')" ontouchend="enviarComandoServoPinza('servo7','stop')">Cerrar</button>
+                <div class="engranaje"><img src="./assets/engranaje-2.png" alt="engranaje" width="100px"></div>
             </div>
 
             <div class="pinza-card">
-                <div class="pinza-sombra">
-                    <h2>Garra A</h2>
-                </div>
-                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo8','bajar')"
-                    onmouseup="enviarComandoServoPinza('servo8','stop')"
-                    ontouchstart="enviarComandoServoPinza('servo8','bajar')"
-                    ontouchend="enviarComandoServoPinza('servo8','stop')">Abrir lado A</button>
-                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo8','subir')"
-                    onmouseup="enviarComandoServoPinza('servo8','stop')"
-                    ontouchstart="enviarComandoServoPinza('servo8','subir')"
-                    ontouchend="enviarComandoServoPinza('servo8','stop')">Cerrar lado A</button>
-                <div class="engranaje">
-                    <img src="./assets/engranaje-2.png" alt="engranaje" width="100px">
-                </div>
+                <div class="pinza-sombra"><h2>Garra A</h2></div>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo8','bajar')" onmouseup="enviarComandoServoPinza('servo8','stop')" ontouchstart="enviarComandoServoPinza('servo8','bajar')" ontouchend="enviarComandoServoPinza('servo8','stop')">Abrir lado A</button>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo8','subir')" onmouseup="enviarComandoServoPinza('servo8','stop')" ontouchstart="enviarComandoServoPinza('servo8','subir')" ontouchend="enviarComandoServoPinza('servo8','stop')">Cerrar lado A</button>
+                <div class="engranaje"><img src="./assets/engranaje-2.png" alt="engranaje" width="100px"></div>
             </div>
 
             <div class="pinza-card">
-                <div class="pinza-sombra">
-                    <h2>Garra B</h2>
-                </div>
-                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo9','bajar')"
-                    onmouseup="enviarComandoServoPinza('servo9','stop')"
-                    ontouchstart="enviarComandoServoPinza('servo9','bajar')"
-                    ontouchend="enviarComandoServoPinza('servo9','stop')">Abrir lado B</button>
-                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo9','subir')"
-                    onmouseup="enviarComandoServoPinza('servo9','stop')"
-                    ontouchstart="enviarComandoServoPinza('servo9','subir')"
-                    ontouchend="enviarComandoServoPinza('servo9','stop')">Cerrar lado B</button>
-                <div class="engranaje">
-                    <img src="./assets/engranaje-2.png" alt="engranaje" width="100px">
-                </div>
+                <div class="pinza-sombra"><h2>Garra B</h2></div>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo9','bajar')" onmouseup="enviarComandoServoPinza('servo9','stop')" ontouchstart="enviarComandoServoPinza('servo9','bajar')" ontouchend="enviarComandoServoPinza('servo9','stop')">Abrir lado B</button>
+                <button class="btn-pinza" onmousedown="enviarComandoServoPinza('servo9','subir')" onmouseup="enviarComandoServoPinza('servo9','stop')" ontouchstart="enviarComandoServoPinza('servo9','subir')" ontouchend="enviarComandoServoPinza('servo9','stop')">Cerrar lado B</button>
+                <div class="engranaje"><img src="./assets/engranaje-2.png" alt="engranaje" width="100px"></div>
             </div>
-
         </div>
 
     </main>
 
     <script src="./app.js"></script>
-
 </body>
-
 </html>

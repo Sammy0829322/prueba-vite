@@ -60,7 +60,7 @@
 .box-eight { grid-column: 2 / 6; grid-row: 13 / 18; }
 
 .box-four, .box-seven, .box-eight {
-    border: 2px solid black;
+ 
     border-radius: 5px;
     display: flex;
     justify-content: center;
@@ -190,7 +190,7 @@
     background-color: rgb(33, 166, 207);
     text-align: center;
     border-radius: 10px;
-    border: 2px solid black;
+ 
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     font-family: 'Archivo Black', sans-serif;
     color: white;

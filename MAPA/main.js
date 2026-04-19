@@ -278,14 +278,14 @@ document.addEventListener("DOMContentLoaded", () => {
             const nuevoItemLista = document.createElement('li');
             nuevoItemLista.style.marginBottom = "15px";
             nuevoItemLista.style.padding = "10px";
-            nuevoItemLista.style.background = "#fff";
-            nuevoItemLista.style.border = "1px solid #ddd";
-            nuevoItemLista.style.borderRadius = "5px";
+            nuevoItemLista.style.background = "rgb(6, 6, 102)";
+            nuevoItemLista.style.border = "2px solid #e2e4ea";
+            nuevoItemLista.style.borderRadius = "7px";
             
             // Insertamos texto, coordenadas y la imagen (si existe)
             nuevoItemLista.innerHTML = `
                 <strong>${textoNota}</strong><br>
-                <span class="coord-guardada" style="color: #666; font-size: 0.9em;">(${textoPosicion})</span>
+                <span class="coord-guardada" style="color: #f4f0f0; font-size: 0.9em;">(${textoPosicion})</span>
                 ${etiquetaImagen}
             `;
 
