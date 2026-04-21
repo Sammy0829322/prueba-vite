@@ -259,6 +259,7 @@ function inicializarGraficaGas() {
                 }] 
             },
             options: { 
+                animation: false,
                 responsive: true, 
                 maintainAspectRatio: false,
                 scales: {

@@ -114,14 +114,27 @@ const loader = new GLTFLoader();
 
 // Cargamos el archivo (asegúrate de tener tu archivo .glb en tu carpeta de proyecto)
 loader.load(
-    './assets/vehicle.glb', // <-- CAMBIA ESTO POR LA RUTA DE TU ARCHIVO
+    './assets/CARRO.glb', // <-- CAMBIA ESTO POR LA RUTA DE TU ARCHIVO
     function (gltf) {
         const modeloVehiculo = gltf.scene;
 
         // --- AJUSTES COMUNES (descomenta si los necesitas) ---
         // 1. Si el modelo es gigante o minúsculo:
         // modeloVehiculo.scale.set(0.5, 0.5, 0.5); 
+        modeloVehiculo.scale.set(0.01, 0.01, 0.01);
+        modeloVehiculo.position.x = 0;   // Izquierda / Derecha
+        modeloVehiculo.position.y = 1; // Arriba / Abajo (Súbelo si está hundido)
+        modeloVehiculo.position.z = 0;   // Adelante / Atrás
+        const gradosARadianes = THREE.MathUtils.degToRad;
+
+        // Si tu carro mira de lado, gíralo 90 o -90 grados en el eje Y (como un trompo)
+        modeloVehiculo.rotation.y = gradosARadianes(-90); 
         
+        // Si tu carro está "parado" sobre la defensa trasera, acuéstalo en el eje X
+        modeloVehiculo.rotation.x = gradosARadianes(0); 
+        
+        // Si está volcado de lado, gíralo en el eje Z
+        modeloVehiculo.rotation.z = gradosARadianes(0);
         // 2. Si el modelo aparece enterrado en el piso o volando:
         // modeloVehiculo.position.y = 0; 
 
