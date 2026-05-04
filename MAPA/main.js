@@ -612,9 +612,9 @@ function moverRobotConSensores() {
     let yawCorregido = sensorData.yaw - yawOffset;
 
     // 1. APLICAR ROTACIÓN 
-    robot.rotation.y = -yawCorregido * gradosARadianes;  
-    robot.rotation.x = sensorData.pitch * gradosARadianes; 
-    robot.rotation.z = sensorData.roll * gradosARadianes;  
+    robot.rotation.y = yawCorregido * gradosARadianes;  
+    robot.rotation.x = -sensorData.pitch * gradosARadianes; 
+    robot.rotation.z = -sensorData.roll * gradosARadianes;  
 
     // 2. APLICAR MOVIMIENTO FÍSICO
     let deltaDistancia = sensorData.distancia - lastDistancia;
