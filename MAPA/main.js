@@ -68,7 +68,7 @@ const plane = new THREE.Mesh(
 plane.rotation.x = -Math.PI / 2;
 scene.add(plane);
 
-const gridHelper = new THREE.GridHelper(100, 100);
+const gridHelper = new THREE.GridHelper(200, 200);
 scene.add(gridHelper);
 
 // Ejes visuales (Rojo = X, Verde = Y, Azul = Z)
