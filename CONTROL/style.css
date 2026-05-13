@@ -713,7 +713,135 @@ background-color: transparent;
 }
 
 
+@media screen and (max-width: 950px) and (orientation: landscape) {
+    .titulo
+    {
+        max-width: 740px;
+        height: 90px;
+    }
+    header
+    {
+        max-width: 740px;
+    }
+    .ip h3 {
+        font-size: 15px;
+    }
+    .btn-conectado button{
+        font-size: 13px;
+    }
 
+    main{
+        max-width: 740px;
+    }
+
+    .luz-card h2 {
+   font-size: 17px;
+   font-weight: bold;
+
+}
+.seccion-luces {
+    gap: 1px;
+    width: 30%;
+    flex-direction: column;
+}
+.btns-izquierda-derecha {
+        width: 40%;
+        gap: 10px;
+}
+.btns-adelante-atras{
+    gap: 10px;
+}
+
+.luz-titulo,.luz-card,.luz-card h2 {
+background-color: transparent;
+}
+.btn-pinza{
+    height: 40px;
+    width: 71px;
+}
+.camara-card2{
+    height: 31%;
+}
+.control-direccion{
+    width: 518px;
+}
+.estabilizacion{
+    margin-top: 10px;
+    width: 222px;
+}
+#slider-x, #slider-y, #slider-z {
+    width: 70%;
+}
+.slider-control{
+    flex-direction: column;
+}
+.pinza-card{
+    width: 23%;
+}
+.engranaje img{
+    width: 70px;
+}
+.engranaje{
+bottom: -28px;
+}
+}
+
+
+@media screen and (max-width: 570px) {
+    .titulo{
+        max-width: 350px;
+        height: 50px;
+    }
+
+    h1{
+        font-size: 25px;
+    }
+    header{
+        max-width: 500px;
+        height: 516px;
+    }
+    main{
+        max-width: 500px;
+        height: 3500px;
+    }
+    .slider-container{
+        flex-direction: column;
+    }
+    .controles{
+        flex-direction: column;
+    }
+    .IP-1{
+        flex-direction: column;
+        height: 50%;
+    }
+    .IP-2{
+        height: 50%;
+        flex-direction: column;
+    }
+    .direip{
+        flex-direction: column;
+        width: 100%;
+    }
+    .ip{
+        width: 90%;
+        
+    }
+    .botones-conectados{
+        height: 30%;
+        width: 60%;
+    }
+    .btn-conectado{
+        
+        width: 90%;
+        height: 30%;
+        align-items: center;
+        margin-left: 0;
+        padding-bottom: 0;
+    }
+    .camara-card2{
+        flex-direction: column;
+    }
+}
 
 
 
