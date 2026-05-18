@@ -1,7 +1,7 @@
 #include <Wire.h>
 #include <SparkFun_BNO08x_Arduino_Library.h>
 #include <ESP32Servo.h>
-#include <PID_v1.h>
+#include <MPU6050.h>
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
@@ -13,125 +13,149 @@ const char* password = "TACOSDEBIRRIA1@";
 
 // --- OBJETOS ---
 BNO08x myIMU;
+MPU6050 mpu;
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 
-// Pines para ESP32-S3 (Configuración Robot Oasis)
+// --- PINES (Configuración Robot Oasis) ---
 const int sdaPin = 8;
 const int sclPin = 9;
-const int pinServoTilt = 18;
-const int pinServoRoll = 21;
-const int pinServoPan = 14;   
+const int pinServoTilt = 21;
+const int pinServoRoll = 18;
+const int pinServoPan  = 14;   
 const int pinSensorHall = 2; 
-
-// <--- NUEVO PIN PARA LEER LA SEÑAL FÍSICA DE REVERSA --->
 const int pinSenalReversaHw = 6; 
 
 Servo servoTilt;
 Servo servoRoll;
-Servo servoPan;               
+Servo servoPan;                
 
-// --- VARIABLES GLOBALES NUEVAS ---
+// --- VARIABLES GLOBALES ---
 bool pidActivado = true; 
 int direccionActual = 1; 
 
-// --- VARIABLES GLOBALES ORIGINALES ---
 volatile int contadorIman = 0; 
 unsigned long ultimoTiempoHall = 0;
 const float distanciaPorPulso = 3.25; 
 float distanciaTotal = 0.0;
 
+// Variables BNO08x (Solo Telemetría)
 float currentYaw = 0;
 float currentPitch = 0;
 float currentRoll = 0;
 
-double setpoint = 0; 
-double inputTilt, outputTilt;
-double inputRoll, outputRoll;
-
-double Kp = 2.2, Ki = 0.01, Kd = 0.5; 
-
-PID pidTilt(&inputTilt, &outputTilt, &setpoint, Kp, Ki, Kd, DIRECT);
-PID pidRoll(&inputRoll, &outputRoll, &setpoint, Kp, Ki, Kd, DIRECT);
-
-const float deadzone = 1.0;        
+// Posiciones de Servos
 float smoothedTilt = 90;          
 float smoothedRoll = 90;
-float smoothedPan = 90;           
+float smoothedPan = 0;           
 float lastTiltPos = 90;           
 float lastRollPos = 90;
-float lastPanPos = 90;            
+float lastPanPos = 0;            
 
-const float smoothingFactor = 0.12; 
+// --- VARIABLES MPU6050 Y PID CUSTOM ---
+float accAngleX, gyroRateX, accAngleY, gyroRateY;
+float tiltFiltered = 90, rollFiltered = 90;
+float alpha = 0.98;
+
+float Kp_tilt = 0.4, Ki_tilt = 0.9, Kd_tilt = 0.001;
+float Kp_roll = 0.4, Ki_roll = 0.9, Kd_roll = 0.001;
+
+float errorTilt, lastErrorTilt = 0, integralTilt = 0;
+float errorRoll, lastErrorRoll = 0, integralRoll = 0;
+
+unsigned long lastTimePID = 0;
 
 // --- INTERRUPCIÓN SENSOR HALL ---
 void IRAM_ATTR deteccionHall() {
   unsigned long tiempoActual = millis();
   
-  // Nota: Dejé el 50 para no alterar tu código original, pero recuerda que si 
-  // en altas velocidades pierde pulsos, debes bajar este valor a 20.
   if (tiempoActual - ultimoTiempoHall > 15) {
-    
-    // NUEVA LÓGICA DE HARDWARE: Leemos el voltaje del Pin 4 al instante
     if (digitalRead(pinSenalReversaHw) == HIGH) {
-        contadorIman -= 1; // Si recibe 3.3V de la otra tarjeta, resta
+        contadorIman -= 1; 
     } else {
-        contadorIman += 1; // Si recibe 0V, suma
+        contadorIman += 1; 
     }
-    
     ultimoTiempoHall = tiempoActual;
   }
 }
 
-// --- TAREA FREERTOS PARA EL PID Y SERVOS (CORE 1) ---
+// --- TAREA FREERTOS PARA EL BNO, MPU Y SERVOS (CORE 1) ---
 void tareaControlPID(void *param) {
   const TickType_t xFrequency = 20 / portTICK_PERIOD_MS;
   TickType_t xLastWakeTime = xTaskGetTickCount();
+  lastTimePID = millis();
 
   while (1) {
+    // 1. LEER BNO08x (Exclusivo para telemetría Websocket)
     if (myIMU.getSensorEvent() == true) {
       if (myIMU.getSensorEventID() == SENSOR_REPORTID_ROTATION_VECTOR) {
-        
-        double rawInputTilt = (myIMU.getPitch()) * 180.0 / PI;
-        double rawInputRoll = (myIMU.getRoll()) * 180.0 / PI;
-        
-        currentPitch = rawInputTilt;
-        currentRoll = rawInputRoll;
+        currentPitch = (myIMU.getPitch()) * 180.0 / PI;
+        currentRoll = (myIMU.getRoll()) * 180.0 / PI;
         currentYaw = (myIMU.getYaw()) * 180.0 / PI;
-
-        // SOLO calcula el PID si está activado
-        if (pidActivado) {
-            inputTilt = (fabs(rawInputTilt) < deadzone) ? 0 : rawInputTilt;
-            inputRoll = (fabs(rawInputRoll) < deadzone) ? 0 : rawInputRoll;
-
-            pidTilt.Compute();
-            pidRoll.Compute();
-
-            float targetTilt = 90 + outputTilt;
-            float targetRoll = 90 + outputRoll;
-
-            smoothedTilt = smoothedTilt + (targetTilt - smoothedTilt) * smoothingFactor;
-            smoothedRoll = smoothedRoll + (targetRoll - smoothedRoll) * smoothingFactor;
-        }
-
-        // ESCRITURA EN LOS SERVOS
-        if (fabs(smoothedTilt - lastTiltPos) > 0.2) {
-            servoTilt.write(constrain(smoothedTilt, 0, 180));
-            lastTiltPos = smoothedTilt;
-        }
-        
-        if (fabs(smoothedRoll - lastRollPos) > 0.2) {
-            servoRoll.write(constrain(smoothedRoll, 0, 180));
-            lastRollPos = smoothedRoll;
-        }
-
-        // NUEVO: Movimiento del PAN (Independiente del PID)
-        if (fabs(smoothedPan - lastPanPos) > 0.2) {
-            servoPan.write(constrain(smoothedPan, 0, 180));
-            lastPanPos = smoothedPan;
-        }
       }
     }
+
+    // 2. LEER MPU6050 Y CONTROL PID
+    unsigned long currentTime = millis();
+    float dt = (currentTime - lastTimePID) / 1000.0;
+    if (dt <= 0) dt = 0.02; // Evitar división por cero
+    lastTimePID = currentTime;
+
+    int16_t ax, ay, az, gx, gy, gz;
+    mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+
+    if (az != 0) {
+      accAngleX = atan2(ay, az) * 180 / PI;
+      accAngleY = atan2(-ax, az) * 180 / PI;
+
+      gyroRateX = gx / 131.0;
+      gyroRateY = gy / 131.0;
+
+      // Filtro complementario
+      tiltFiltered = alpha * (tiltFiltered + gyroRateX * dt) + (1 - alpha) * accAngleX;
+      rollFiltered = alpha * (rollFiltered + gyroRateY * dt) + (1 - alpha) * accAngleY;
+
+      // Calcular PID solo si está activado
+      if (pidActivado) {
+        // PID Tilt
+        errorTilt = 0 - tiltFiltered;
+        integralTilt += errorTilt * dt;
+        integralTilt = constrain(integralTilt, -100, 100);
+        float derivativeTilt = (errorTilt - lastErrorTilt) / dt;
+        float outputTilt = Kp_tilt * errorTilt + Ki_tilt * integralTilt + Kd_tilt * derivativeTilt;
+        lastErrorTilt = errorTilt;
+
+        // PID Roll
+        errorRoll = 0 - rollFiltered;
+        integralRoll += errorRoll * dt;
+        integralRoll = constrain(integralRoll, -100, 100);
+        float derivativeRoll = (errorRoll - lastErrorRoll) / dt;
+        float outputRoll = Kp_roll * errorRoll + Ki_roll * integralRoll + Kd_roll * derivativeRoll;
+        lastErrorRoll = errorRoll;
+
+        // Ángulos corregidos para los servos
+        smoothedTilt = constrain(90 + outputTilt, 0, 180);
+        smoothedRoll = constrain(90 - outputRoll, 0, 180);
+      }
+    }
+
+    // 3. ESCRITURA EN LOS SERVOS
+    if (fabs(smoothedTilt - lastTiltPos) > 0.5) {
+        servoTilt.write(smoothedTilt);
+        lastTiltPos = smoothedTilt;
+    }
+    
+    if (fabs(smoothedRoll - lastRollPos) > 0.5) {
+        servoRoll.write(smoothedRoll);
+        lastRollPos = smoothedRoll;
+    }
+
+    // Movimiento del PAN (Siempre Independiente del PID)
+    if (fabs(smoothedPan - lastPanPos) > 0.2) {
+        servoPan.write(constrain(smoothedPan, 0, 180));
+        lastPanPos = smoothedPan;
+    }
+
     vTaskDelayUntil(&xLastWakeTime, xFrequency);
   }
 }
@@ -146,7 +170,7 @@ void onWebSocketMessage(AsyncWebSocket *server, AsyncWebSocketClient *client, Aw
         if (!error) {
             String tipo = doc["tipo"].as<String>();
 
-            // 1. PETICIÓN DE POSICIÓN
+            // 1. PETICIÓN DE POSICIÓN (Valores BNO08x)
             if (tipo == "posicion") {
                 StaticJsonDocument<256> response; 
                 response["tipo"] = "datos_sensor";
@@ -162,14 +186,15 @@ void onWebSocketMessage(AsyncWebSocket *server, AsyncWebSocketClient *client, Aw
                 serializeJson(response, output);
                 client->text(output);
             }
-            // 2. ACTIVAR/DESACTIVAR PID
+            // 2. ACTIVAR/DESACTIVAR PID MPU6050
             else if (tipo == "estado_pid") {
                 pidActivado = doc["activado"].as<bool>();
                 
                 if (pidActivado) {
-                    pidTilt.SetMode(MANUAL); pidTilt.SetMode(AUTOMATIC);
-                    pidRoll.SetMode(MANUAL); pidRoll.SetMode(AUTOMATIC);
-                    Serial.println("PID Activado");
+                    // Reiniciamos variables de integración para evitar saltos bruscos
+                    integralTilt = 0; lastErrorTilt = 0;
+                    integralRoll = 0; lastErrorRoll = 0;
+                    Serial.println("PID Activado (Control MPU6050)");
                 } else {
                     Serial.println("PID Desactivado - Modo Manual");
                 }
@@ -179,13 +204,11 @@ void onWebSocketMessage(AsyncWebSocket *server, AsyncWebSocketClient *client, Aw
                 String eje = doc["eje"].as<String>();
                 float angulo = doc["angulo"].as<float>();
                 
-                // Tilt y Roll solo se mueven manualmente si el PID está apagado
                 if (!pidActivado) {
                     if (eje == "tilt") smoothedTilt = angulo;
                     else if (eje == "roll") smoothedRoll = angulo;
                 }
                 
-                // El PAN siempre se puede mover manualmente, sin importar el PID
                 if (eje == "pan") {
                     smoothedPan = angulo;
                 }
@@ -195,8 +218,8 @@ void onWebSocketMessage(AsyncWebSocket *server, AsyncWebSocketClient *client, Aw
                 String comando = doc["comando"].as<String>();
                 
                 if (comando == "atras") {
-                    direccionActual = -1; // Esto ya no afecta la interrupción, pero lo dejo para no alterar nada más.
-                    Serial.println("Odometría: Mensaje de Reversa Recibido (La medición real depende del Pin 4)");
+                    direccionActual = -1; 
+                    Serial.println("Odometría: Mensaje de Reversa Recibido");
                 } else {
                     direccionActual = 1; 
                     Serial.println("Odometría: Mensaje de Adelante/Stop Recibido");
@@ -209,10 +232,7 @@ void onWebSocketMessage(AsyncWebSocket *server, AsyncWebSocketClient *client, Aw
 void setup() {
   Serial.begin(115200);
   
-  // <--- NUEVO: CONFIGURACIÓN DEL PIN DE REVERSA --->
-  // Usamos INPUT_PULLDOWN por seguridad: si el cable se desconecta, leerá LOW (hacia adelante)
   pinMode(pinSenalReversaHw, INPUT_PULLDOWN); 
-
   pinMode(pinSensorHall, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(pinSensorHall), deteccionHall, FALLING); 
 
@@ -225,32 +245,30 @@ void setup() {
   servoRoll.setPeriodHertz(50);
   servoPan.setPeriodHertz(50); 
   
-  servoTilt.write(90);
-  servoRoll.write(90);
-  servoPan.write(90);          
-  
   servoTilt.attach(pinServoTilt, 500, 2400);
   servoRoll.attach(pinServoRoll, 500, 2400);
   servoPan.attach(pinServoPan, 500, 2400); 
 
+  servoTilt.write(90);
+  servoRoll.write(90);
+  servoPan.write(0);          
+
   Wire.begin(sdaPin, sclPin);
 
+  // Inicializar BNO08x
   if (myIMU.begin(0x4A, Wire) == false && myIMU.begin(0x4B, Wire) == false) {
     Serial.println("Error: Sensor BNO08x no detectado.");
-    while (1);
+  } else {
+    myIMU.enableRotationVector(20000); 
   }
 
-  myIMU.enableRotationVector(20000); 
+  // Inicializar MPU6050
+  mpu.initialize();
+  if (!mpu.testConnection()) {
+    Serial.println("Error: MPU6050 no detectado.");
+  }
 
-  pidTilt.SetMode(AUTOMATIC);
-  pidTilt.SetOutputLimits(-70, 70); 
-  pidRoll.SetMode(AUTOMATIC);
-  pidRoll.SetOutputLimits(-70, 70);
-  
-  pidTilt.SetSampleTime(20);
-  pidRoll.SetSampleTime(20);
-
-  Serial.println("Gimbal: Modo Cinemático Activado.");
+  Serial.println("Gimbal: Modo Cinemático Activado (BNO Telemetría, MPU PID).");
 
   WiFi.begin(ssid, password);
   Serial.print("Conectando a WiFi");
@@ -276,7 +294,9 @@ void loop() {
 
   static unsigned long lastMsg = 0;
   if (millis() - lastMsg > 500) { 
-    Serial.print("Yaw: "); Serial.print(currentYaw, 1);
+    Serial.print("Yaw BNO: "); Serial.print(currentYaw, 1);
+    Serial.print(" | Tilt MPU: "); Serial.print(tiltFiltered, 1);
+    Serial.print(" | Roll MPU: "); Serial.print(rollFiltered, 1);
     Serial.print(" | Distancia: "); Serial.print(contadorIman * distanciaPorPulso); Serial.println(" cm");
     lastMsg = millis();
   }
